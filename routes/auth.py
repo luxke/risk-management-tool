@@ -30,7 +30,8 @@ def login():
             session['user_id'] = user['user_id']
             session['full_name'] = user['full_name']
             session['role'] = user['role']
-
+            session["department_id"] = user["department_id"]
+            
             return redirect('/')
 
         return "Invalid email or password"
