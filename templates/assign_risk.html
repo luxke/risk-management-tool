@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+Assign Risk
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-7">
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+
+<h4>Assign Risk</h4>
+
+</div>
+
+<div class="card-body">
+
+<h5>{{ risk.Tittle }}</h5>
+
+<p>{{ risk.Description }}</p>
+
+<form method="POST">
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Assign Employee
+
+</label>
+
+<select
+name="owner_id"
+class="form-select"
+required>
+
+<option value="">
+
+Select Employee
+
+</option>
+
+{% for employee in employees %}
+
+<option value="{{ employee.user_id }}">
+
+{{ employee.full_name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<button
+class="btn btn-success">
+
+Assign Risk
+
+</button>
+
+<a
+href="/"
+class="btn btn-secondary">
+
+Cancel
+
+</a>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

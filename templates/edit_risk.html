@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Add Risk
+Edit Risk
 {% endblock %}
 
 {% block content %}
@@ -12,9 +12,9 @@ Add Risk
 
 <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-warning text-dark">
 
-<h3 class="mb-0">Create New Risk</h3>
+<h3 class="mb-0">Edit Risk</h3>
 
 </div>
 
@@ -30,7 +30,7 @@ Add Risk
 type="text"
 name="Tittle"
 class="form-control"
-placeholder="Enter risk title"
+value="{{ risk.Tittle }}"
 required>
 
 </div>
@@ -43,8 +43,7 @@ required>
 name="description"
 rows="4"
 class="form-control"
-placeholder="Describe the risk..."
-required></textarea>
+required>{{ risk.Description }}</textarea>
 
 </div>
 
@@ -59,12 +58,14 @@ name="department_id"
 class="form-select"
 required>
 
-<option value="">Select Department</option>
-
 {% for department in departments %}
 
-<option value="{{ department.department_id }}">
+<option
+value="{{ department.department_id }}"
+{% if department.department_id == risk.department_id %}selected{% endif %}>
+
 {{ department.department_name }}
+
 </option>
 
 {% endfor %}
@@ -82,12 +83,14 @@ name="category_id"
 class="form-select"
 required>
 
-<option value="">Select Category</option>
-
 {% for category in categories %}
 
-<option value="{{ category.category_id }}">
+<option
+value="{{ category.category_id }}"
+{% if category.category_id == risk.category_id %}selected{% endif %}>
+
 {{ category.category_name }}
+
 </option>
 
 {% endfor %}
@@ -102,20 +105,24 @@ required>
 
 <div class="col-md-6 mb-3">
 
-<label class="form-label">Probability (1-5)</label>
+<label class="form-label">Probability</label>
 
 <select
 name="probability"
 class="form-select"
 required>
 
-<option value="">Select</option>
+{% for i in range(1,6) %}
 
-<option value="1">1 - Very Low</option>
-<option value="2">2 - Low</option>
-<option value="3">3 - Medium</option>
-<option value="4">4 - High</option>
-<option value="5">5 - Very High</option>
+<option
+value="{{ i }}"
+{% if i == risk.Probability %}selected{% endif %}>
+
+{{ i }}
+
+</option>
+
+{% endfor %}
 
 </select>
 
@@ -123,20 +130,24 @@ required>
 
 <div class="col-md-6 mb-3">
 
-<label class="form-label">Impact (1-5)</label>
+<label class="form-label">Impact</label>
 
 <select
 name="impact"
 class="form-select"
 required>
 
-<option value="">Select</option>
+{% for i in range(1,6) %}
 
-<option value="1">1 - Very Low</option>
-<option value="2">2 - Low</option>
-<option value="3">3 - Medium</option>
-<option value="4">4 - High</option>
-<option value="5">5 - Very High</option>
+<option
+value="{{ i }}"
+{% if i == risk.Impact %}selected{% endif %}>
+
+{{ i }}
+
+</option>
+
+{% endfor %}
 
 </select>
 
@@ -154,9 +165,9 @@ Cancel
 
 <button
 type="submit"
-class="btn btn-primary">
+class="btn btn-warning">
 
-Create Risk
+Update Risk
 
 </button>
 

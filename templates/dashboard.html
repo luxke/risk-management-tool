@@ -21,45 +21,45 @@ My Dashboard
 
 </h2>
 
-<!-- Statistics Cards -->
+<!-- Statistics -->
 
 <div class="row mb-4">
 
-    <div class="col-md-3">
-        <div class="card shadow border-0">
-            <div class="card-body text-center">
-                <h6>Total Risks</h6>
-                <h2>{{ total_risks }}</h2>
-            </div>
-        </div>
-    </div>
+<div class="col-md-3">
+<div class="card shadow border-0">
+<div class="card-body text-center">
+<h6>Total Risks</h6>
+<h2>{{ total_risks }}</h2>
+</div>
+</div>
+</div>
 
-    <div class="col-md-3">
-        <div class="card shadow border-0">
-            <div class="card-body text-center">
-                <h6>🔴 High Risks</h6>
-                <h2>{{ high_risks }}</h2>
-            </div>
-        </div>
-    </div>
+<div class="col-md-3">
+<div class="card shadow border-0">
+<div class="card-body text-center">
+<h6>🔴 High Risks</h6>
+<h2>{{ high_risks }}</h2>
+</div>
+</div>
+</div>
 
-    <div class="col-md-3">
-        <div class="card shadow border-0">
-            <div class="card-body text-center">
-                <h6>🟡 Medium Risks</h6>
-                <h2>{{ medium_risks }}</h2>
-            </div>
-        </div>
-    </div>
+<div class="col-md-3">
+<div class="card shadow border-0">
+<div class="card-body text-center">
+<h6>🟡 Medium Risks</h6>
+<h2>{{ medium_risks }}</h2>
+</div>
+</div>
+</div>
 
-    <div class="col-md-3">
-        <div class="card shadow border-0">
-            <div class="card-body text-center">
-                <h6>🟢 Low Risks</h6>
-                <h2>{{ low_risks }}</h2>
-            </div>
-        </div>
-    </div>
+<div class="col-md-3">
+<div class="card shadow border-0">
+<div class="card-body text-center">
+<h6>🟢 Low Risks</h6>
+<h2>{{ low_risks }}</h2>
+</div>
+</div>
+</div>
 
 </div>
 
@@ -67,122 +67,288 @@ My Dashboard
 
 <div class="card shadow">
 
-    <div class="card-body">
+<div class="card-body">
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3">
 
-            {% if session["role"] == "Admin" %}
-                <h4>All Risks</h4>
+{% if session["role"] == "Admin" %}
 
-            {% elif session["role"] == "Risk Manager" %}
-                <h4>Department Risks</h4>
+<h4>All Risks</h4>
 
-            {% else %}
-                <h4>My Risks</h4>
+{% elif session["role"] == "Risk Manager" %}
 
-            {% endif %}
+<h4>Department Risks</h4>
 
-            <a href="/add-risk" class="btn btn-success">
-                + Add New Risk
-            </a>
+{% else %}
 
-        </div>
+<h4>My Risks</h4>
 
-        <div class="table-responsive">
+{% endif %}
 
-            <table class="table table-hover table-bordered">
+{% if session["role"] == "Admin" %}
+<a href="/add-risk" class="btn btn-success">
++ Add New Risk
+</a>
+{% endif %}
 
-                <thead class="table-dark">
+</div>
 
-                    <tr>
+<div class="table-responsive">
 
-                        <th>ID</th>
+<table class="table table-hover table-bordered align-middle">
 
-                        <th>Title</th>
+<thead class="table-dark">
 
-                        {% if session["role"] == "Admin" %}
-                            <th>Owner</th>
-                            <th>Department</th>
+<tr>
 
-                        {% elif session["role"] == "Risk Manager" %}
-                            <th>Owner</th>
+<th>ID</th>
 
-                        {% endif %}
+<th>Title</th>
 
-                        <th>Probability</th>
-                        <th>Impact</th>
-                        <th>Score</th>
-                        <th>Status</th>
+{% if session["role"] == "Admin" %}
+<th>Department</th>
+<th>Assigned To</th>
 
-                    </tr>
+{% elif session["role"] == "Risk Manager" %}
+<th>Assigned To</th>
+{% endif %}
 
-                </thead>
+<th>Probability</th>
+<th>Impact</th>
+<th>Score</th>
+<th>Status</th>
+<th>Actions</th>
 
-                <tbody>
+</tr>
 
-                {% for risk in risks %}
+</thead>
 
-                    <tr>
+<tbody>
 
-                        <td>{{ risk.Risk_id }}</td>
+{% for risk in risks %}
 
-                        <td>{{ risk.Tittle }}</td>
+<tr>
 
-                        {% if session["role"] == "Admin" %}
+<td>{{ risk.Risk_id }}</td>
 
-                            <td>{{ risk.full_name }}</td>
+<td>{{ risk.Tittle }}</td>
 
-                            <td>{{ risk.department_name }}</td>
+{% if session["role"] == "Admin" %}
 
-                        {% elif session["role"] == "Risk Manager" %}
+<td>{{ risk.department_name }}</td>
 
-                            <td>{{ risk.full_name }}</td>
+<td>
 
-                        {% endif %}
+{% if risk.full_name %}
+{{ risk.full_name }}
+{% else %}
+<span class="text-danger fw-bold">
+Not Assigned
+</span>
+{% endif %}
 
-                        <td>{{ risk.Probability }}</td>
+</td>
 
-                        <td>{{ risk.Impact }}</td>
+{% elif session["role"] == "Risk Manager" %}
 
-                        <td>{{ risk.Score }}</td>
+<td>
 
-                        <td>
+{% if risk.full_name %}
+{{ risk.full_name }}
+{% else %}
+<span class="text-danger fw-bold">
+Not Assigned
+</span>
+{% endif %}
 
-                            {% if risk.status == "Open" %}
-                                <span class="badge bg-danger">
-                                    {{ risk.status }}
-                                </span>
+</td>
 
-                            {% elif risk.status == "Closed" %}
-                                <span class="badge bg-success">
-                                    {{ risk.status }}
-                                </span>
+{% endif %}
 
-                            {% elif risk.status == "In Progress" %}
-                                <span class="badge bg-warning text-dark">
-                                    {{ risk.status }}
-                                </span>
+<!-- Probability -->
 
-                            {% else %}
-                                <span class="badge bg-secondary">
-                                    {{ risk.status }}
-                                </span>
+<td>
 
-                            {% endif %}
+{% if risk.Probability >= 4 %}
 
-                        </td>
+<span class="badge bg-danger">
+High
+</span>
 
-                    </tr>
+{% elif risk.Probability == 3 %}
 
-                {% endfor %}
+<span class="badge bg-warning text-dark">
+Medium
+</span>
 
-                </tbody>
+{% else %}
 
-            </table>
+<span class="badge bg-success">
+Low
+</span>
 
-        </div>
+{% endif %}
 
-    </div>
+</td>
+
+<!-- Impact -->
+
+<td>
+
+{% if risk.Impact >= 4 %}
+
+<span class="badge bg-danger">
+High
+</span>
+
+{% elif risk.Impact == 3 %}
+
+<span class="badge bg-warning text-dark">
+Medium
+</span>
+
+{% else %}
+
+<span class="badge bg-success">
+Low
+</span>
+
+{% endif %}
+
+</td>
+
+<!-- Score -->
+
+<td>
+
+{% if risk.Score >= 15 %}
+
+<span class="badge bg-danger">
+{{ risk.Score }}
+</span>
+
+{% elif risk.Score >= 8 %}
+
+<span class="badge bg-warning text-dark">
+{{ risk.Score }}
+</span>
+
+{% else %}
+
+<span class="badge bg-success">
+{{ risk.Score }}
+</span>
+
+{% endif %}
+
+</td>
+
+<!-- Status -->
+
+<td>
+
+{% if risk.status == "Open" %}
+
+<span class="badge bg-primary">
+Open
+</span>
+
+{% elif risk.status == "Assigned" %}
+
+<span class="badge bg-secondary">
+Assigned
+</span>
+
+{% elif risk.status == "Under Review" %}
+
+<span class="badge bg-warning text-dark">
+Under Review
+</span>
+
+{% elif risk.status == "Mitigation Actions" %}
+
+<span class="badge bg-danger">
+Mitigation
+</span>
+
+{% elif risk.status == "Monitoring" %}
+
+<span class="badge bg-info">
+Monitoring
+</span>
+
+{% elif risk.status == "Closed" %}
+
+<span class="badge bg-success">
+Closed
+</span>
+
+{% else %}
+
+<span class="badge bg-dark">
+{{ risk.status }}
+</span>
+
+{% endif %}
+
+</td>
+
+<!-- Actions -->
+
+<td>
+
+{% if session["role"] == "Admin" %}
+
+<a href="/edit-risk/{{ risk.Risk_id }}"
+class="btn btn-warning btn-sm">
+✏ Edit
+</a>
+
+<a href="/delete-risk/{{ risk.Risk_id }}"
+class="btn btn-danger btn-sm"
+onclick="return confirm('Delete this risk?');">
+🗑 Delete
+</a>
+
+{% elif session["role"] == "Risk Manager" %}
+
+{% if not risk.full_name %}
+
+<a href="/assign-risk/{{ risk.Risk_id }}"
+class="btn btn-primary btn-sm">
+Assign Employee
+</a>
+
+{% else %}
+
+<span class="badge bg-success">
+Assigned
+</span>
+
+{% endif %}
+
+{% else %}
+
+<a href="/update-risk/{{ risk.Risk_id }}"
+class="btn btn-success btn-sm">
+Update Status
+</a>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
 
 </div>
 
