@@ -252,3 +252,57 @@ def delete_risk(risk_id):
     conn.close()
 
     return redirect("/")
+
+@risks_bp.route("/update-risk/<int:risk_id>", methods=["GET", "POST"])
+@login_required
+def update_risk(risk_id):
+
+    # Only employees can update risks
+    if session["role"] != "Employee":
+        return "Access Denied", 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Ensure the risk belongs to the logged-in employee
+    cursor.execute("""
+        SELECT *
+        FROM risks
+        WHERE
+            Risk_id=%s
+            AND Owner_id=%s
+    """, (
+        risk_id,
+        session["user_id"]
+    ))
+
+    risk = cursor.fetchone()
+
+    if not risk:
+        conn.close()
+        return "Risk not found.", 404
+
+    if request.method == "POST":
+
+        status = request.form["status"]
+
+        cursor.execute("""
+            UPDATE risks
+            SET status=%s
+            WHERE Risk_id=%s
+        """, (
+            status,
+            risk_id
+        ))
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/")
+
+    conn.close()
+
+    return render_template(
+        "update_risk.html",
+        risk=risk
+    )

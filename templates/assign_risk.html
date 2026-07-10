@@ -1,3 +1,4 @@
+```html
 {% extends "base.html" %}
 
 {% block title %}
@@ -8,21 +9,53 @@ Assign Risk
 
 <div class="row justify-content-center">
 
-<div class="col-md-7">
+<div class="col-md-8">
 
 <div class="card shadow">
 
 <div class="card-header bg-primary text-white">
 
-<h4>Assign Risk</h4>
+<h4>Assign Risk to Employee</h4>
 
 </div>
 
 <div class="card-body">
 
+<div class="mb-4">
+
 <h5>{{ risk.Tittle }}</h5>
 
-<p>{{ risk.Description }}</p>
+<p class="text-muted">
+{{ risk.Description }}
+</p>
+
+<hr>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<strong>Department:</strong><br>
+
+{{ session["department_name"] }}
+
+</div>
+
+<div class="col-md-6">
+
+<strong>Current Status:</strong><br>
+
+<span class="badge bg-warning text-dark">
+
+{{ risk.status }}
+
+</span>
+
+</div>
+
+</div>
+
+</div>
 
 <form method="POST">
 
@@ -41,7 +74,7 @@ required>
 
 <option value="">
 
-Select Employee
+-- Select Employee --
 
 </option>
 
@@ -59,7 +92,10 @@ Select Employee
 
 </div>
 
+<div class="d-flex gap-2">
+
 <button
+type="submit"
 class="btn btn-success">
 
 Assign Risk
@@ -74,6 +110,8 @@ Cancel
 
 </a>
 
+</div>
+
 </form>
 
 </div>
@@ -85,3 +123,4 @@ Cancel
 </div>
 
 {% endblock %}
+```

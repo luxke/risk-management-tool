@@ -301,13 +301,13 @@ Closed
 
 <a href="/edit-risk/{{ risk.Risk_id }}"
 class="btn btn-warning btn-sm">
-✏ Edit
+ Edit
 </a>
 
 <a href="/delete-risk/{{ risk.Risk_id }}"
 class="btn btn-danger btn-sm"
 onclick="return confirm('Delete this risk?');">
-🗑 Delete
+ Delete
 </a>
 
 {% elif session["role"] == "Risk Manager" %}
