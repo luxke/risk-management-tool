@@ -72,20 +72,17 @@ My Dashboard
 <div class="d-flex justify-content-between align-items-center mb-3">
 
 {% if session["role"] == "Admin" %}
-
 <h4>All Risks</h4>
 
 {% elif session["role"] == "Risk Manager" %}
-
 <h4>Department Risks</h4>
 
 {% else %}
-
 <h4>My Risks</h4>
 
 {% endif %}
 
-{% if session["role"] == "Admin" %}
+{% if session["role"] in ["Admin", "Risk Manager"] %}
 <a href="/add-risk" class="btn btn-success">
 + Add New Risk
 </a>
@@ -102,7 +99,6 @@ My Dashboard
 <tr>
 
 <th>ID</th>
-
 <th>Title</th>
 
 {% if session["role"] == "Admin" %}
@@ -247,37 +243,37 @@ Low
 
 <td>
 
-{% if risk.status == "Open" %}
+{% if risk.status_name == "Open" %}
 
 <span class="badge bg-primary">
 Open
 </span>
 
-{% elif risk.status == "Assigned" %}
+{% elif risk.status_name == "Assigned" %}
 
 <span class="badge bg-secondary">
 Assigned
 </span>
 
-{% elif risk.status == "Under Review" %}
+{% elif risk.status_name == "Under Review" %}
 
 <span class="badge bg-warning text-dark">
 Under Review
 </span>
 
-{% elif risk.status == "Mitigation Actions" %}
+{% elif risk.status_name == "Mitigation in Progress" %}
 
 <span class="badge bg-danger">
 Mitigation
 </span>
 
-{% elif risk.status == "Monitoring" %}
+{% elif risk.status_name == "Monitoring" %}
 
 <span class="badge bg-info">
 Monitoring
 </span>
 
-{% elif risk.status == "Closed" %}
+{% elif risk.status_name == "Closed" %}
 
 <span class="badge bg-success">
 Closed
@@ -286,7 +282,7 @@ Closed
 {% else %}
 
 <span class="badge bg-dark">
-{{ risk.status }}
+{{ risk.status_name }}
 </span>
 
 {% endif %}
@@ -301,13 +297,13 @@ Closed
 
 <a href="/edit-risk/{{ risk.Risk_id }}"
 class="btn btn-warning btn-sm">
- Edit
+Edit
 </a>
 
 <a href="/delete-risk/{{ risk.Risk_id }}"
 class="btn btn-danger btn-sm"
 onclick="return confirm('Delete this risk?');">
- Delete
+Delete
 </a>
 
 {% elif session["role"] == "Risk Manager" %}

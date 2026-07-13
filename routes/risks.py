@@ -146,15 +146,15 @@ def assign_risk(risk_id):
         owner_id = request.form["owner_id"]
 
         cursor.execute("""
-            UPDATE risks
-            SET
-                Owner_id=%s,
-                status='Assigned'
-            WHERE Risk_id=%s
-        """, (
-            owner_id,
-            risk_id
-        ))
+        UPDATE risks
+        SET
+            Owner_id=%s,
+            status_id=2
+        WHERE Risk_id=%s
+    """, (
+        owner_id,
+        risk_id
+    ))
 
         conn.commit()
         conn.close()

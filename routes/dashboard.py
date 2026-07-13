@@ -17,14 +17,12 @@ def dashboard():
     # ==========================================
     if session["role"] == "Admin":
 
-        # Total Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
         """)
         total_risks = cursor.fetchone()["total"]
 
-        # High Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -32,7 +30,6 @@ def dashboard():
         """)
         high_risks = cursor.fetchone()["total"]
 
-        # Medium Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -40,7 +37,6 @@ def dashboard():
         """)
         medium_risks = cursor.fetchone()["total"]
 
-        # Low Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -48,7 +44,6 @@ def dashboard():
         """)
         low_risks = cursor.fetchone()["total"]
 
-        # All Risks
         cursor.execute("""
             SELECT
                 r.Risk_id,
@@ -56,18 +51,27 @@ def dashboard():
                 r.Description,
                 r.Owner_id,
                 r.category_id,
-                r.department_id,       
+                r.department_id,
                 r.Probability,
                 r.Impact,
                 r.Score,
-                r.status,
+
+                rs.status_name,
+
                 u.full_name,
                 d.department_name
+
             FROM risks r
+
+            LEFT JOIN risk_status rs
+                ON r.status_id = rs.status_id
+
             LEFT JOIN users u
                 ON r.Owner_id = u.user_id
+
             LEFT JOIN departments d
                 ON r.department_id = d.department_id
+
             ORDER BY r.Risk_id DESC
         """)
 
@@ -76,7 +80,6 @@ def dashboard():
     # ==========================================
     elif session["role"] == "Risk Manager":
 
-        # Total Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -84,7 +87,6 @@ def dashboard():
         """, (session["department_id"],))
         total_risks = cursor.fetchone()["total"]
 
-        # High Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -93,7 +95,6 @@ def dashboard():
         """, (session["department_id"],))
         high_risks = cursor.fetchone()["total"]
 
-        # Medium Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -102,7 +103,6 @@ def dashboard():
         """, (session["department_id"],))
         medium_risks = cursor.fetchone()["total"]
 
-        # Low Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -111,7 +111,6 @@ def dashboard():
         """, (session["department_id"],))
         low_risks = cursor.fetchone()["total"]
 
-        # Department Risks
         cursor.execute("""
             SELECT
                 r.Risk_id,
@@ -122,12 +121,21 @@ def dashboard():
                 r.Probability,
                 r.Impact,
                 r.Score,
-                r.status,
+
+                rs.status_name,
+
                 u.full_name
+
             FROM risks r
+
+            LEFT JOIN risk_status rs
+                ON r.status_id = rs.status_id
+
             LEFT JOIN users u
                 ON r.Owner_id = u.user_id
+
             WHERE r.department_id=%s
+
             ORDER BY r.Risk_id DESC
         """, (session["department_id"],))
 
@@ -136,7 +144,6 @@ def dashboard():
     # ==========================================
     else:
 
-        # Total Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -144,7 +151,6 @@ def dashboard():
         """, (session["user_id"],))
         total_risks = cursor.fetchone()["total"]
 
-        # High Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -153,7 +159,6 @@ def dashboard():
         """, (session["user_id"],))
         high_risks = cursor.fetchone()["total"]
 
-        # Medium Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -162,7 +167,6 @@ def dashboard():
         """, (session["user_id"],))
         medium_risks = cursor.fetchone()["total"]
 
-        # Low Risks
         cursor.execute("""
             SELECT COUNT(*) AS total
             FROM risks
@@ -171,20 +175,26 @@ def dashboard():
         """, (session["user_id"],))
         low_risks = cursor.fetchone()["total"]
 
-        # My Risks
         cursor.execute("""
             SELECT
-                Risk_id,
-                Tittle,
-                Description,
-                department_id,
-                Probability,
-                Impact,
-                Score,
-                status
-            FROM risks
-            WHERE Owner_id=%s
-            ORDER BY Risk_id DESC
+                r.Risk_id,
+                r.Tittle,
+                r.Description,
+                r.department_id,
+                r.Probability,
+                r.Impact,
+                r.Score,
+
+                rs.status_name
+
+            FROM risks r
+
+            LEFT JOIN risk_status rs
+                ON r.status_id = rs.status_id
+
+            WHERE r.Owner_id=%s
+
+            ORDER BY r.Risk_id DESC
         """, (session["user_id"],))
 
     risks = cursor.fetchall()
