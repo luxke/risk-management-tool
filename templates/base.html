@@ -122,13 +122,17 @@ Menu
 </a>
 </li>
 
-{% if session["role"] == "Admin" %}
+{% if session["role"] in ["Admin", "Risk Manager"] %}
 
 <li class="nav-item">
 <a href="/add-risk" class="nav-link">
 ⚠️ Create Risk
 </a>
 </li>
+
+{% endif %}
+
+{% if session["role"] == "Admin" %}
 
 <li class="nav-item">
 <a href="/users" class="nav-link">

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}
+Departments
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Department Management
+</h2>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h4>Departments</h4>
+
+            <a href="/add-department" class="btn btn-success">
+                + Add Department
+            </a>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover table-bordered">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Department Name</th>
+                        <th width="220">Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% if departments %}
+
+                        {% for department in departments %}
+
+                        <tr>
+
+                            <td>{{ department.department_id }}</td>
+
+                            <td>{{ department.department_name }}</td>
+
+                            <td>
+
+                                <a href="/edit-department/{{ department.department_id }}"
+                                   class="btn btn-warning btn-sm">
+                                    Edit
+                                </a>
+
+                                <a href="/delete-department/{{ department.department_id }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Are you sure you want to delete this department?');">
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="3" class="text-center text-muted">
+
+                                No departments found.
+
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

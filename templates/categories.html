@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}
+Categories
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+
+Risk Categories
+
+</h2>
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<h4>Categories</h4>
+
+<a href="/add-category"
+class="btn btn-success">
+
++ Add Category
+
+</a>
+
+</div>
+
+<div class="table-responsive">
+
+<table class="table table-hover table-bordered">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>ID</th>
+<th>Category Name</th>
+<th width="220">Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% if categories %}
+
+{% for category in categories %}
+
+<tr>
+
+<td>{{ category.category_id }}</td>
+
+<td>{{ category.category_name }}</td>
+
+<td>
+
+<a href="/edit-category/{{ category.category_id }}"
+class="btn btn-warning btn-sm">
+
+Edit
+
+</a>
+
+<a href="/delete-category/{{ category.category_id }}"
+class="btn btn-danger btn-sm"
+onclick="return confirm('Delete this category?');">
+
+Delete
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+{% else %}
+
+<tr>
+
+<td colspan="3"
+class="text-center">
+
+No categories found.
+
+</td>
+
+</tr>
+
+{% endif %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

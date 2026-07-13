@@ -9,19 +9,33 @@ risks_bp = Blueprint("risks", __name__)
 @login_required
 def add_risk():
 
-    # Only Admin can create risks
-    if session["role"] != "Admin":
+    # Only Admin and risk manager can create risks
+    if session["role"] not in ["Admin", "Risk Manager"]:
         return "Access Denied", 403
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Load departments
-    cursor.execute("""
+    # ==========================
+# Load Departments
+# ==========================
+
+    if session["role"] == "Admin":
+
+        cursor.execute("""
         SELECT *
         FROM departments
         ORDER BY department_name
-    """)
+      """)
+
+    else:
+
+        cursor.execute("""
+        SELECT *
+        FROM departments
+        WHERE department_id = %s
+      """, (session["department_id"],))
+
     departments = cursor.fetchall()
 
     # Load categories
@@ -44,6 +58,8 @@ def add_risk():
 
         score = probability * impact
 
+        created_by = session["user_id"]
+
         cursor.execute("""
             INSERT INTO risks
             (
@@ -52,23 +68,25 @@ def add_risk():
                 Probability,
                 Impact,
                 Score,
-                status,
+                status_id,
                 Owner_id,
                 department_id,
-                category_id
+                category_id,
+                created_by
             )
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
             title,
             description,
             probability,
             impact,
             score,
-            "Open",
+            1,
             None,
             department_id,
-            category_id
+            category_id,
+            created_by
         ))
 
         conn.commit()
