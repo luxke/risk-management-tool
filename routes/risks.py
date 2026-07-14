@@ -9,43 +9,48 @@ risks_bp = Blueprint("risks", __name__)
 @login_required
 def add_risk():
 
-    # Only Admin and risk manager can create risks
-    if session["role"] not in ["Admin", "Risk Manager"]:
+    # Only Admin and Risk Manager can create risks
+    if session["role"] not in ["Admin","Risk Manager"]:
         return "Access Denied", 403
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     # ==========================
-# Load Departments
-# ==========================
-
+    # Load Departments
+    # ==========================
     if session["role"] == "Admin":
 
         cursor.execute("""
-        SELECT *
-        FROM departments
-        ORDER BY department_name
-      """)
+            SELECT *
+            FROM departments
+            ORDER BY department_name
+        """)
 
     else:
 
         cursor.execute("""
-        SELECT *
-        FROM departments
-        WHERE department_id = %s
-      """, (session["department_id"],))
+            SELECT *
+            FROM departments
+            WHERE department_id = %s
+        """, (session["department_id"],))
 
     departments = cursor.fetchall()
 
-    # Load categories
+    # ==========================
+    # Load Categories
+    # ==========================
     cursor.execute("""
         SELECT *
         FROM risk_categories
         ORDER BY category_name
     """)
+
     categories = cursor.fetchall()
 
+    # ==========================
+    # Save Risk
+    # ==========================
     if request.method == "POST":
 
         title = request.form["Tittle"]
@@ -53,7 +58,13 @@ def add_risk():
         probability = int(request.form["probability"])
         impact = int(request.form["impact"])
 
-        department_id = request.form["department_id"]
+        # Department
+        if session["role"] == "Admin":
+            department_id = request.form["department_id"]
+        else:
+            department_id = session["department_id"]
+
+        # Category
         category_id = request.form["category_id"]
 
         score = probability * impact
@@ -82,8 +93,8 @@ def add_risk():
             probability,
             impact,
             score,
-            1,
-            None,
+            1,          # Open
+            None,       # No owner yet
             department_id,
             category_id,
             created_by
@@ -282,13 +293,23 @@ def update_risk(risk_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Ensure the risk belongs to the logged-in employee
+    # Load the employee's assigned risk
     cursor.execute("""
-        SELECT *
-        FROM risks
+        SELECT
+            r.*,
+            d.department_name,
+            c.category_name,
+            s.status_name
+        FROM risks r
+        LEFT JOIN departments d
+            ON r.department_id = d.department_id
+        LEFT JOIN risk_categories c
+            ON r.category_id = c.category_id
+        LEFT JOIN risk_status s
+            ON r.status_id = s.status_id
         WHERE
-            Risk_id=%s
-            AND Owner_id=%s
+            r.Risk_id=%s
+            AND r.Owner_id=%s
     """, (
         risk_id,
         session["user_id"]
@@ -300,18 +321,85 @@ def update_risk(risk_id):
         conn.close()
         return "Risk not found.", 404
 
+    # Load all statuses
+    cursor.execute("""
+        SELECT *
+        FROM risk_status
+        ORDER BY status_id
+    """)
+    statuses = cursor.fetchall()
+
     if request.method == "POST":
 
-        status = request.form["status"]
+        status_id = int(request.form["status_id"])
+        progress_notes = request.form["progress_notes"]
 
+        # ---------------------------------
+        # Get old status name
+        # ---------------------------------
+        cursor.execute("""
+            SELECT status_name
+            FROM risk_status
+            WHERE status_id=%s
+        """, (risk["status_id"],))
+
+        old_status = cursor.fetchone()["status_name"]
+
+        # ---------------------------------
+        # Get new status name
+        # ---------------------------------
+        cursor.execute("""
+            SELECT status_name
+            FROM risk_status
+            WHERE status_id=%s
+        """, (status_id,))
+
+        new_status = cursor.fetchone()["status_name"]
+
+        # ---------------------------------
+        # Update Risk
+        # ---------------------------------
         cursor.execute("""
             UPDATE risks
-            SET status=%s
+            SET
+                status_id=%s,
+                progress_notes=%s
             WHERE Risk_id=%s
         """, (
-            status,
+            status_id,
+            progress_notes,
             risk_id
         ))
+
+        # ---------------------------------
+        # Build audit message
+        # ---------------------------------
+        actions = []
+
+        if old_status != new_status:
+            actions.append(
+                f"Changed status from '{old_status}' to '{new_status}'."
+            )
+
+        if progress_notes.strip():
+            actions.append("Updated progress notes.")
+
+        # Save audit only if something changed
+        if actions:
+
+            cursor.execute("""
+                INSERT INTO risk_audit
+                (
+                    risk_id,
+                    action_taken,
+                    changed_by
+                )
+                VALUES (%s,%s,%s)
+            """, (
+                risk_id,
+                " ".join(actions),
+                session["user_id"]
+            ))
 
         conn.commit()
         conn.close()
@@ -322,5 +410,6 @@ def update_risk(risk_id):
 
     return render_template(
         "update_risk.html",
-        risk=risk
+        risk=risk,
+        statuses=statuses
     )

@@ -1,0 +1,103 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}
+Risk History
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+Risk Audit History
+</h2>
+
+<div class="card shadow">
+
+<div class="card-header bg-dark text-white">
+
+<h5 class="mb-0">
+Risk #{{ risk_id }} Activity Log
+</h5>
+
+</div>
+
+<div class="card-body">
+
+{% if history %}
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover align-middle">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Date & Time</th>
+<th>Changed By</th>
+<th>Action Taken</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for log in history %}
+
+<tr>
+
+<td>
+{{ log.change_date }}
+</td>
+
+<td>
+
+{% if log.full_name %}
+{{ log.full_name }}
+{% else %}
+System
+{% endif %}
+
+</td>
+
+<td>
+{{ log.action_taken }}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% else %}
+
+<div class="alert alert-info">
+
+No activity has been recorded for this risk yet.
+
+</div>
+
+{% endif %}
+
+<div class="text-end mt-3">
+
+<a href="/" class="btn btn-secondary">
+
+← Back to Dashboard
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+```

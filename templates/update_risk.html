@@ -1,0 +1,264 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Update Risk
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-lg-10">
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+
+<h3 class="mb-0">
+Employee Risk Workspace
+</h3>
+
+</div>
+
+<div class="card-body">
+
+<form method="POST">
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+
+<label class="form-label fw-bold">
+Risk Title
+</label>
+
+<input
+type="text"
+class="form-control"
+value="{{ risk.Tittle }}"
+readonly>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label class="form-label fw-bold">
+Department
+</label>
+
+<input
+type="text"
+class="form-control"
+value="{{ risk.department_name }}"
+readonly>
+
+</div>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label fw-bold">
+Description
+</label>
+
+<textarea
+class="form-control"
+rows="4"
+readonly>{{ risk.Description }}</textarea>
+
+</div>
+
+<div class="row">
+
+<div class="col-md-3 mb-3">
+
+<label class="form-label fw-bold">
+Category
+</label>
+
+<input
+type="text"
+class="form-control"
+value="{{ risk.category_name }}"
+readonly>
+
+</div>
+
+<div class="col-md-2 mb-3">
+
+<label class="form-label fw-bold">
+Probability
+</label>
+
+<input
+type="text"
+class="form-control"
+value="{{ risk.Probability }}"
+readonly>
+
+</div>
+
+<div class="col-md-2 mb-3">
+
+<label class="form-label fw-bold">
+Impact
+</label>
+
+<input
+type="text"
+class="form-control"
+value="{{ risk.Impact }}"
+readonly>
+
+</div>
+
+<div class="col-md-2 mb-3">
+
+<label class="form-label fw-bold">
+Risk Score
+</label>
+
+{% if risk.Score >= 15 %}
+
+<div class="alert alert-danger text-center py-2 mb-0">
+<strong>{{ risk.Score }}</strong><br>
+High
+</div>
+
+{% elif risk.Score >= 8 %}
+
+<div class="alert alert-warning text-center py-2 mb-0">
+<strong>{{ risk.Score }}</strong><br>
+Medium
+</div>
+
+{% else %}
+
+<div class="alert alert-success text-center py-2 mb-0">
+<strong>{{ risk.Score }}</strong><br>
+Low
+</div>
+
+{% endif %}
+
+</div>
+
+<div class="col-md-3 mb-3">
+
+<label class="form-label fw-bold">
+Current Status
+</label>
+
+<p>
+
+{% if risk.status_name == "Open" %}
+<span class="badge bg-primary">{{ risk.status_name }}</span>
+
+{% elif risk.status_name == "Assigned" %}
+<span class="badge bg-secondary">{{ risk.status_name }}</span>
+
+{% elif risk.status_name == "Under Review" %}
+<span class="badge bg-warning text-dark">{{ risk.status_name }}</span>
+
+{% elif risk.status_name == "Mitigation" %}
+<span class="badge bg-danger">{{ risk.status_name }}</span>
+
+{% elif risk.status_name == "Monitoring" %}
+<span class="badge bg-info">{{ risk.status_name }}</span>
+
+{% elif risk.status_name == "Closed" %}
+<span class="badge bg-success">{{ risk.status_name }}</span>
+
+{% else %}
+<span class="badge bg-dark">{{ risk.status_name }}</span>
+{% endif %}
+
+</p>
+
+</div>
+
+</div>
+
+<hr>
+
+<h5>
+Progress Update
+</h5>
+
+<div class="mb-3">
+
+<label class="form-label fw-bold">
+Progress Notes
+</label>
+
+<textarea
+name="progress_notes"
+rows="7"
+class="form-control"
+placeholder="Describe the work completed...">{{ risk.progress_notes }}</textarea>
+
+</div>
+
+<div class="mb-4">
+
+<label class="form-label fw-bold">
+Update Status
+</label>
+
+<select
+name="status_id"
+class="form-select"
+required>
+
+{% for status in statuses %}
+
+<option
+value="{{ status.status_id }}"
+{% if status.status_id == risk.status_id %}
+selected
+{% endif %}>
+
+{{ status.status_name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="text-end">
+
+<a href="/" class="btn btn-secondary">
+Back
+</a>
+
+<button
+type="reset"
+class="btn btn-warning">
+Reset
+</button>
+
+<button
+type="submit"
+class="btn btn-success px-4">
+Save Changes
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+

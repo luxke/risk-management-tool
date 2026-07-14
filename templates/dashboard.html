@@ -81,8 +81,9 @@ My Dashboard
 <h4>My Risks</h4>
 
 {% endif %}
+<!--Admin, Risk Manager, and Employee can add new risks -->
 
-{% if session["role"] in ["Admin", "Risk Manager"] %}
+{% if session["role"] in ["Admin","Employee"] %} 
 <a href="/add-risk" class="btn btn-success">
 + Add New Risk
 </a>
@@ -295,9 +296,15 @@ Closed
 
 {% if session["role"] == "Admin" %}
 
+
 <a href="/edit-risk/{{ risk.Risk_id }}"
 class="btn btn-warning btn-sm">
 Edit
+</a>
+
+<a href="/risk-history/{{ risk.Risk_id }}"
+class="btn btn-info btn-sm">
+History
 </a>
 
 <a href="/delete-risk/{{ risk.Risk_id }}"
@@ -305,6 +312,8 @@ class="btn btn-danger btn-sm"
 onclick="return confirm('Delete this risk?');">
 Delete
 </a>
+
+
 
 {% elif session["role"] == "Risk Manager" %}
 
@@ -322,7 +331,7 @@ Assigned
 </span>
 
 {% endif %}
-
+<a href="/risk-history/{{ risk.Risk_id }}" class="btn btn-info btn-sm"> History </a>
 {% else %}
 
 <a href="/update-risk/{{ risk.Risk_id }}"

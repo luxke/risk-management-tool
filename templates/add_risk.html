@@ -54,6 +54,8 @@ required></textarea>
 
 <label class="form-label">Department</label>
 
+{% if session["role"] == "Admin" %}
+
 <select
 name="department_id"
 class="form-select"
@@ -70,6 +72,16 @@ required>
 {% endfor %}
 
 </select>
+
+{% else %}
+
+<input
+type="text"
+class="form-control"
+value="{{ departments[0].department_name }}"
+readonly>
+
+{% endif %}
 
 </div>
 

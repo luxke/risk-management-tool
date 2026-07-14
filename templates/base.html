@@ -120,8 +120,8 @@ Menu
 🏠 Dashboard
 </a>
 </li>
-
-{% if session["role"] in ["Admin", "Risk Manager"] %}
+<!--Admin, Risk Manager, and Employee can add new risks -->
+{% if session["role"] in ["Admin","Employee"] %}
 
 <li class="nav-item">
 <a href="/add-risk" class="nav-link">

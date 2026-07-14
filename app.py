@@ -9,6 +9,8 @@ from routes.risks import risks_bp
 from routes.users import users_bp
 from routes.departments import departments_bp
 from routes.categories import categories_bp
+from routes.audit import audit_bp
+from routes.reports import reports_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
@@ -16,6 +18,8 @@ app.register_blueprint(risks_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(departments_bp)
 app.register_blueprint(categories_bp)
+app.register_blueprint(audit_bp)
+app.register_blueprint(reports_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)
