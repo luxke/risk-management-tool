@@ -175,22 +175,21 @@ def reports():
 
     for status_id, key in statuses:
 
-        if session["role"] == "Admin":
+        status_where = where_clause
+        status_params = list(params)
 
-            cursor.execute("""
-                SELECT COUNT(*) AS total
-                FROM risks
-                WHERE status_id=%s
-            """, (status_id,))
-
+        if status_where:
+            status_where += " AND status_id=%s"
         else:
+            status_where = "WHERE status_id=%s"
 
-            cursor.execute("""
-                SELECT COUNT(*) AS total
-                FROM risks
-                WHERE department_id=%s
-                AND status_id=%s
-            """, (session["department_id"], status_id))
+        status_params.append(status_id)
+
+        cursor.execute(f"""
+            SELECT COUNT(*) AS total
+            FROM risks
+            {status_where}
+        """, tuple(status_params))
 
         status_counts[key] = cursor.fetchone()["total"]
 
@@ -198,77 +197,100 @@ def reports():
     # DEPARTMENT REPORT
     # ==========================================
 
-    if session["role"] == "Admin":
+    department_query = """
+    SELECT
+        d.department_name,
+        COUNT(r.Risk_id) AS total_risks,
+        SUM(
+            CASE
+                WHEN r.Score >= 15 THEN 1
+                ELSE 0
+            END
+        ) AS high_risks
+    FROM departments d
+    LEFT JOIN risks r
+        ON d.department_id = r.department_id
+    """
 
-        cursor.execute("""
-            SELECT
-                d.department_name,
-                COUNT(r.Risk_id) AS total_risks,
-                SUM(
-                    CASE
-                        WHEN r.Score >= 15 THEN 1
-                        ELSE 0
-                    END
-                ) AS high_risks
-            FROM departments d
-            LEFT JOIN risks r
-                ON d.department_id = r.department_id
-            GROUP BY d.department_id
-            ORDER BY total_risks DESC
-        """)
+    department_conditions = []
+    department_params = []
 
-    else:
+    # Risk Manager only sees own department
+    if session["role"] == "Risk Manager":
+        department_conditions.append("d.department_id=%s")
+        department_params.append(session["department_id"])
 
-        cursor.execute("""
-            SELECT
-                d.department_name,
-                COUNT(r.Risk_id) AS total_risks,
-                SUM(
-                    CASE
-                        WHEN r.Score >= 15 THEN 1
-                        ELSE 0
-                    END
-                ) AS high_risks
-            FROM departments d
-            LEFT JOIN risks r
-                ON d.department_id = r.department_id
-            WHERE d.department_id=%s
-            GROUP BY d.department_id
-        """, params)
+    # Admin Department Filter
+    elif selected_department:
+        department_conditions.append("d.department_id=%s")
+        department_params.append(selected_department)
 
+    # Category Filter
+    if selected_category:
+        department_conditions.append("r.category_id=%s")
+        department_params.append(selected_category)
+
+    # Status Filter
+    if selected_status:
+        department_conditions.append("r.status_id=%s")
+        department_params.append(selected_status)
+
+    if department_conditions:
+        department_query += " WHERE " + " AND ".join(department_conditions)
+
+    department_query += """
+    GROUP BY d.department_id
+    ORDER BY total_risks DESC
+    """
+
+    cursor.execute(department_query, tuple(department_params))
     departments = cursor.fetchall()
 
     # ==========================================
     # CATEGORY REPORT
     # ==========================================
 
-    if session["role"] == "Admin":
+    category_query = """
+    SELECT
+        c.category_name,
+        COUNT(r.Risk_id) AS total_risks
+    FROM risk_categories c
+    LEFT JOIN risks r
+        ON c.category_id = r.category_id
+    """
 
-        cursor.execute("""
-            SELECT
-                c.category_name,
-                COUNT(r.Risk_id) AS total_risks
-            FROM risk_categories c
-            LEFT JOIN risks r
-                ON c.category_id = r.category_id
-            GROUP BY c.category_id
-            ORDER BY total_risks DESC
-        """)
+    category_conditions = []
+    category_params = []
 
-    else:
+    # Risk Manager only sees own department
+    if session["role"] == "Risk Manager":
+        category_conditions.append("r.department_id=%s")
+        category_params.append(session["department_id"])
 
-        cursor.execute("""
-            SELECT
-                c.category_name,
-                COUNT(r.Risk_id) AS total_risks
-            FROM risk_categories c
-            LEFT JOIN risks r
-                ON c.category_id = r.category_id
-            WHERE r.department_id=%s
-            GROUP BY c.category_id
-            ORDER BY total_risks DESC
-        """, params)
+    # Admin Department Filter
+    elif selected_department:
+        category_conditions.append("r.department_id=%s")
+        category_params.append(selected_department)
 
+    # Category Filter
+    if selected_category:
+        category_conditions.append("c.category_id=%s")
+        category_params.append(selected_category)
+
+    # Status Filter
+    if selected_status:
+        category_conditions.append("r.status_id=%s")
+        category_params.append(selected_status)
+
+    if category_conditions:
+        category_query += " WHERE " + " AND ".join(category_conditions)
+
+    category_query += """
+    GROUP BY c.category_id
+    ORDER BY total_risks DESC
+    """
+
+    cursor.execute(category_query, tuple(category_params))
     categories = cursor.fetchall()
 
     conn.close()
