@@ -328,6 +328,94 @@ def dashboard():
 
     category_chart = cursor.fetchall()
 
+    # ==========================================
+    # RISK TREND CHART
+    # ==========================================
+
+    if session["role"] == "Admin":
+
+        cursor.execute("""
+            SELECT
+                DATE(created_at) AS day,
+                COUNT(*) AS total
+            FROM risks
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at)
+        """)
+
+    elif session["role"] == "Risk Manager":
+
+        cursor.execute("""
+            SELECT
+                DATE(created_at) AS day,
+                COUNT(*) AS total
+            FROM risks
+            WHERE department_id=%s
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at)
+        """, (session["department_id"],))
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                DATE(created_at) AS day,
+                COUNT(*) AS total
+            FROM risks
+            WHERE Owner_id=%s
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at)
+        """, (session["user_id"],))
+
+    trend_chart = cursor.fetchall()
+
+    # ==========================================
+    # TOP 5 HIGHEST RISKS
+    # ==========================================
+
+    if session["role"] == "Admin":
+
+        cursor.execute("""
+            SELECT
+                Tittle,
+                Score,
+                Probability,
+                Impact
+            FROM risks
+            ORDER BY Score DESC
+            LIMIT 5
+        """)
+
+    elif session["role"] == "Risk Manager":
+
+        cursor.execute("""
+            SELECT
+                Tittle,
+                Score,
+                Probability,
+                Impact
+            FROM risks
+            WHERE department_id=%s
+            ORDER BY Score DESC
+            LIMIT 5
+        """, (session["department_id"],))
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                Tittle,
+                Score,
+                Probability,
+                Impact
+            FROM risks
+            WHERE Owner_id=%s
+            ORDER BY Score DESC
+            LIMIT 5
+        """, (session["user_id"],))
+
+    top_risks = cursor.fetchall()
+
     conn.close()
 
     return render_template(
@@ -342,7 +430,9 @@ def dashboard():
 
         status_chart=status_chart,
         department_chart=department_chart,
-        category_chart=category_chart
+        category_chart=category_chart,
+        trend_chart=trend_chart,
+        top_risks=top_risks
     )
 
 

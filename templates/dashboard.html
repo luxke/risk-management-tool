@@ -6,6 +6,8 @@ Dashboard
 
 {% block content %}
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <h2 class="mb-4">
 
 {% if session["role"] == "Admin" %}
@@ -63,6 +65,158 @@ My Dashboard
 
 </div>
 
+<hr class="my-4">
+
+<h4 class="mb-4">
+Risk Analytics
+</h4>
+
+<div class="row">
+
+    <div class="col-lg-4 mb-4">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-primary text-white">
+                Risk Status
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="statusChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4 mb-4">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-success text-white">
+                Department Risks
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="departmentChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4 mb-4">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-warning text-dark">
+                Risk Categories
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="categoryChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<hr class="my-4">
+
+<div class="card shadow mb-4">
+
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">📈 Risk Trend</h5>
+    </div>
+
+    <div class="card-body">
+
+        <canvas id="trendChart"></canvas>
+
+    </div>
+
+</div>
+
+<div class="card shadow mb-4">
+
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"> Top 5 Highest Risks</h5>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+                    <th>Risk</th>
+                    <th>Score</th>
+                    <th>Level</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for risk in top_risks %}
+
+                <tr>
+
+                    <td>{{ risk.Tittle }}</td>
+
+                    <td>
+
+                        <span class="badge bg-danger">
+                            {{ risk.Score }}
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        {% if risk.Score >= 15 %}
+
+                            <span class="badge bg-danger">
+                                High
+                            </span>
+
+                        {% elif risk.Score >= 8 %}
+
+                            <span class="badge bg-warning text-dark">
+                                Medium
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-success">
+                                Low
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
 <!-- Risk Table -->
 
 <div class="card shadow">
@@ -83,7 +237,7 @@ My Dashboard
 {% endif %}
 <!--Admin, Risk Manager, and Employee can add new risks -->
 
-{% if session["role"] in ["Admin","Employee"] %} 
+{% if session["role"] in ["Admin","Risk Manager"] %} 
 <a href="/add-risk" class="btn btn-success">
 + Add New Risk
 </a>
@@ -296,6 +450,10 @@ Closed
 
 {% if session["role"] == "Admin" %}
 
+<a href="/risk-details/{{ risk.Risk_id }}"
+class="btn btn-primary btn-sm">
+    View
+</a>
 
 <a href="/edit-risk/{{ risk.Risk_id }}"
 class="btn btn-warning btn-sm">
@@ -319,6 +477,11 @@ Delete
 
 {% if not risk.full_name %}
 
+<a href="/risk-details/{{ risk.Risk_id }}"
+class="btn btn-primary btn-sm">
+    View
+</a>
+
 <a href="/assign-risk/{{ risk.Risk_id }}"
 class="btn btn-primary btn-sm">
 Assign Employee
@@ -333,6 +496,11 @@ Assigned
 {% endif %}
 <a href="/risk-history/{{ risk.Risk_id }}" class="btn btn-info btn-sm"> History </a>
 {% else %}
+
+<a href="/risk-details/{{ risk.Risk_id }}"
+class="btn btn-primary btn-sm">
+    View
+</a>
 
 <a href="/update-risk/{{ risk.Risk_id }}"
 class="btn btn-success btn-sm">
@@ -356,5 +524,229 @@ Update Status
 </div>
 
 </div>
+<script>
+
+//
+// STATUS CHART
+//
+
+const statusLabels = [
+{% for item in status_chart %}
+"{{ item.status_name }}",
+{% endfor %}
+];
+
+const statusData = [
+{% for item in status_chart %}
+{{ item.total }},
+{% endfor %}
+];
+
+new Chart(document.getElementById("statusChart"), {
+
+    type: "pie",
+
+    data: {
+
+        labels: statusLabels,
+
+        datasets: [{
+
+            data: statusData,
+
+            backgroundColor: [
+                "#0d6efd",
+                "#6c757d",
+                "#ffc107",
+                "#0dcaf0",
+                "#198754",
+                "#dc3545"
+            ]
+
+        }]
+
+    }
+
+});
+
+
+//
+// DEPARTMENT CHART
+//
+
+const departmentLabels = [
+{% for item in department_chart %}
+"{{ item.department_name }}",
+{% endfor %}
+];
+
+const departmentData = [
+{% for item in department_chart %}
+{{ item.total }},
+{% endfor %}
+];
+
+new Chart(document.getElementById("departmentChart"), {
+
+    type: "bar",
+
+    data: {
+
+        labels: departmentLabels,
+
+        datasets: [{
+
+            label: "Risks",
+
+            data: departmentData,
+
+            backgroundColor: "#198754"
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        }
+
+    }
+
+});
+
+
+//
+// CATEGORY CHART
+//
+
+const categoryLabels = [
+{% for item in category_chart %}
+"{{ item.category_name }}",
+{% endfor %}
+];
+
+const categoryData = [
+{% for item in category_chart %}
+{{ item.total }},
+{% endfor %}
+];
+
+new Chart(document.getElementById("categoryChart"), {
+
+    type: "doughnut",
+
+    data: {
+
+        labels: categoryLabels,
+
+        datasets: [{
+
+            data: categoryData,
+
+            backgroundColor: [
+                "#0d6efd",
+                "#198754",
+                "#ffc107",
+                "#dc3545",
+                "#6f42c1",
+                "#fd7e14",
+                "#20c997"
+            ]
+
+        }]
+
+    }
+
+});
+
+
+
+//
+// TREND CHART
+//
+
+const trendLabels = [
+{% for item in trend_chart %}
+"{{ item.day }}",
+{% endfor %}
+];
+
+const trendData = [
+{% for item in trend_chart %}
+{{ item.total }},
+{% endfor %}
+];
+
+new Chart(document.getElementById("trendChart"), {
+
+    type: "line",
+
+    data: {
+
+        labels: trendLabels,
+
+        datasets: [{
+
+            label: "Risks Created",
+
+            data: trendData,
+
+            borderColor: "#0d6efd",
+
+            backgroundColor: "rgba(13,110,253,0.2)",
+
+            fill: true,
+
+            tension: 0.4
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                display: true
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    precision: 0
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
 
 {% endblock %}

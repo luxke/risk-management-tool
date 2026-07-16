@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}
+Notifications
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+🔔 My Notifications
+</h2>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        {% if notifications %}
+
+            <div class="list-group">
+
+                {% for notification in notifications %}
+
+                <div class="list-group-item">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            {% if notification.is_read == 0 %}
+                                <span class="badge bg-danger">New</span>
+                            {% else %}
+                                <span class="badge bg-success">Read</span>
+                            {% endif %}
+
+                            <strong class="ms-2">
+                                {{ notification.message }}
+                            </strong>
+
+                            <br>
+
+                            <small class="text-muted">
+                                {{ notification.created_at }}
+                            </small>
+
+                        </div>
+
+                        {% if notification.is_read == 0 %}
+
+                        <a href="/mark-notification/{{ notification.notification_id }}"
+                           class="btn btn-sm btn-primary">
+
+                            Mark Read
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info">
+
+                No notifications available.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

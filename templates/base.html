@@ -88,6 +88,18 @@ Welcome,
 </span>
 {% endif %}
 
+<a href="/notifications" class="btn btn-outline-warning position-relative me-3">
+
+    🔔
+
+    {% if unread_notifications > 0 %}
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        {{ unread_notifications }}
+    </span>
+    {% endif %}
+
+</a>
+
 <a href="/logout"
 class="btn btn-outline-light btn-sm">
 

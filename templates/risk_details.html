@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}
+Risk Details
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>
+            Risk Details
+        </h2>
+
+        <a href="/" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+    <!-- Header Card -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-primary text-white">
+
+            <h4 class="mb-0">
+                {{ risk.risk_reference }}
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p><strong>Title</strong></p>
+
+                    <p>{{ risk.Tittle }}</p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <p><strong>Status</strong></p>
+
+                    <span class="badge bg-primary">
+                        {{ risk.status_name }}
+                    </span>
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <p><strong>Department</strong></p>
+
+                    <p>{{ risk.department_name }}</p>
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <p><strong>Category</strong></p>
+
+                    <p>{{ risk.category_name }}</p>
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <p><strong>Assigned To</strong></p>
+
+                    <p>
+                        {% if risk.full_name %}
+                            {{ risk.full_name }}
+                        {% else %}
+                            <span class="text-danger">Not Assigned</span>
+                        {% endif %}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Strategic Objective -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-dark text-white">
+
+            Strategic Objective
+
+        </div>
+
+        <div class="card-body">
+
+            {{ risk.strategic_objective }}
+
+        </div>
+
+    </div>
+
+    <!-- Risk Description -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-dark text-white">
+
+            Risk Description
+
+        </div>
+
+        <div class="card-body">
+
+            {{ risk.Description }}
+
+        </div>
+
+    </div>
+
+    <!-- Cause of Risk -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-dark text-white">
+
+            Cause of Risk
+
+        </div>
+
+        <div class="card-body">
+
+            {{ risk.cause_of_risk }}
+
+        </div>
+
+    </div>
+
+    <!-- Existing Controls -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-dark text-white">
+
+            Existing Controls
+
+        </div>
+
+        <div class="card-body">
+
+            {{ risk.existing_controls }}
+
+        </div>
+
+    </div>
+
+    <!-- Key Risk Indicator -->
+
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-dark text-white">
+
+            Key Risk Indicator
+
+        </div>
+
+        <div class="card-body">
+
+            {{ risk.key_risk_indicator }}
+
+        </div>
+
+    </div>
+
+    <!-- Risk Assessment -->
+
+    <div class="card shadow">
+
+        <div class="card-header bg-danger text-white">
+
+            Risk Assessment
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row text-center">
+
+                <div class="col-md-4">
+
+                    <h6>Probability</h6>
+
+                    <h3>{{ risk.Probability }}</h3>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h6>Impact</h6>
+
+                    <h3>{{ risk.Impact }}</h3>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h6>Score</h6>
+
+                    <h3>{{ risk.Score }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

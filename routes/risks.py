@@ -58,6 +58,12 @@ def add_risk():
         probability = int(request.form["probability"])
         impact = int(request.form["impact"])
 
+        risk_reference = request.form["risk_reference"]
+        strategic_objective = request.form["strategic_objective"]
+        cause_of_risk = request.form["cause_of_risk"]
+        key_risk_indicator = request.form["key_risk_indicator"]
+        existing_controls = request.form["existing_controls"]
+
         # Department
         if session["role"] == "Admin":
             department_id = request.form["department_id"]
@@ -74,11 +80,16 @@ def add_risk():
         cursor.execute("""
             INSERT INTO risks
             (
+                risk_reference,
+                strategic_objective,
                 Tittle,
                 Description,
+                cause_of_risk,
                 Probability,
                 Impact,
                 Score,
+                key_risk_indicator,
+                existing_controls,
                 status_id,
                 Owner_id,
                 department_id,
@@ -86,13 +97,18 @@ def add_risk():
                 created_by
             )
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
+            risk_reference,
+            strategic_objective,
             title,
             description,
+            cause_of_risk,
             probability,
             impact,
             score,
+            key_risk_indicator,
+            existing_controls,
             1,          # Open
             None,       # No owner yet
             department_id,
@@ -156,16 +172,37 @@ def assign_risk(risk_id):
 
         owner_id = request.form["owner_id"]
 
+        # Assign employee and change status to Assigned
         cursor.execute("""
-        UPDATE risks
-        SET
-            Owner_id=%s,
-            status_id=2
-        WHERE Risk_id=%s
-    """, (
-        owner_id,
-        risk_id
-    ))
+            UPDATE risks
+            SET
+                Owner_id=%s,
+                status_id=2
+            WHERE Risk_id=%s
+        """, (
+            owner_id,
+            risk_id
+        ))
+
+        # Create notification
+        cursor.execute("""
+            INSERT INTO notifications
+            (
+                user_id,
+                risk_id,
+                message
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s
+            )
+        """, (
+            owner_id,
+            risk_id,
+            f"You have been assigned Risk #{risk_id}. Please review and begin mitigation."
+        ))
 
         conn.commit()
         conn.close()
@@ -412,4 +449,52 @@ def update_risk(risk_id):
         "update_risk.html",
         risk=risk,
         statuses=statuses
+    )
+
+@risks_bp.route("/risk-details/<int:risk_id>")
+@login_required
+def risk_details(risk_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            r.*,
+
+            d.department_name,
+
+            c.category_name,
+
+            rs.status_name,
+
+            u.full_name
+
+        FROM risks r
+
+        LEFT JOIN departments d
+            ON r.department_id = d.department_id
+
+        LEFT JOIN risk_categories c
+            ON r.category_id = c.category_id
+
+        LEFT JOIN risk_status rs
+            ON r.status_id = rs.status_id
+
+        LEFT JOIN users u
+            ON r.Owner_id = u.user_id
+
+        WHERE r.Risk_id = %s
+    """, (risk_id,))
+
+    risk = cursor.fetchone()
+
+    conn.close()
+
+    if not risk:
+        return "Risk not found", 404
+
+    return render_template(
+        "risk_details.html",
+        risk=risk
     )
