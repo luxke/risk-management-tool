@@ -146,22 +146,159 @@ required>
 
 <div class="mb-3">
     <label class="form-label">Existing Controls</label>
+
     <textarea
         name="existing_controls"
         class="form-control"
-        rows="3"></textarea>
+        rows="3"
+        placeholder="Describe the current controls that already exist"></textarea>
+
+    <div class="row mt-3">
+
+        <div class="col-md-6">
+
+            <label class="form-label">Control Effectiveness</label>
+
+            <select
+                name="control_effectiveness"
+                class="form-select">
+
+                <option value="">Select</option>
+                <option value="Effective">Effective</option>
+                <option value="Partially Effective">Partially Effective</option>
+                <option value="Ineffective">Ineffective</option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <label class="form-label">Control Owner</label>
+
+            <input
+                type="text"
+                name="control_owner"
+                class="form-control"
+                placeholder="Person responsible">
+
+        </div>
+
+    </div>
+
 </div>
 
+<hr>
 
+<h5 class="mb-3">
+Risk Assessment
+</h5>
 
+<div class="row">
 
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Risk Owner</label>
 
+        {% if session["role"] == "Admin" %}
+            <input
+                type="text"
+                class="form-control"
+                value="Will be assigned later"
+                readonly>
+        {% else %}
+            <input
+                type="text"
+                class="form-control"
+                value="{{ session['full_name'] }}"
+                readonly>
+        {% endif %}
+    </div>
 
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Risk Appetite</label>
 
+        <select
+            name="risk_appetite"
+            class="form-select">
 
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
 
+        </select>
+    </div>
 
+</div>
 
+<hr>
+
+<h5 class="mb-3 text-primary">
+Risk Treatment
+</h5>
+
+<div class="mb-3">
+
+<label class="form-label">
+Treatment Strategy
+</label>
+
+<select
+name="treatment_strategy"
+class="form-select">
+
+<option value="">Select Strategy</option>
+<option value="Avoid">Avoid</option>
+<option value="Reduce">Reduce</option>
+<option value="Transfer">Transfer</option>
+<option value="Accept">Accept</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+Action Plan
+</label>
+
+<textarea
+name="action_plan"
+rows="3"
+class="form-control"
+placeholder="Describe how this risk will be managed..."></textarea>
+
+</div>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+
+<label class="form-label">
+Review Date
+</label>
+
+<input
+type="date"
+name="review_date"
+class="form-control">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label class="form-label">
+Target Closure Date
+</label>
+
+<input
+type="date"
+name="target_closure_date"
+class="form-control">
+
+</div>
+
+</div>
 
 
 <div class="row">
@@ -210,6 +347,76 @@ required>
 
 </div>
 
+<hr>
+
+<h5 class="text-success mb-3">
+Residual Risk Assessment
+</h5>
+
+<div class="row">
+
+<div class="col-md-4 mb-3">
+
+<label class="form-label">
+Residual Probability
+</label>
+
+<select
+name="residual_probability"
+id="residual_probability"
+class="form-select">
+
+<option value="">Select</option>
+<option value="1">1 - Very Low</option>
+<option value="2">2 - Low</option>
+<option value="3">3 - Medium</option>
+<option value="4">4 - High</option>
+<option value="5">5 - Very High</option>
+
+</select>
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label class="form-label">
+Residual Impact
+</label>
+
+<select
+name="residual_impact"
+id="residual_impact"
+class="form-select">
+
+<option value="">Select</option>
+<option value="1">1 - Very Low</option>
+<option value="2">2 - Low</option>
+<option value="3">3 - Medium</option>
+<option value="4">4 - High</option>
+<option value="5">5 - Very High</option>
+
+</select>
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label class="form-label">
+Residual Score
+</label>
+
+<input
+type="number"
+id="residual_score"
+name="residual_score"
+class="form-control"
+readonly>
+
+</div>
+
+</div>
+
+
 <div class="d-flex justify-content-end">
 
 <a href="/" class="btn btn-secondary me-2">
@@ -237,5 +444,31 @@ Create Risk
 </div>
 
 </div>
+
+<script>
+
+function calculateResidualScore(){
+
+    let probability =
+        Number(document.getElementById("residual_probability").value);
+
+    let impact =
+        Number(document.getElementById("residual_impact").value);
+
+    document.getElementById("residual_score").value =
+        probability * impact;
+
+}
+
+document.getElementById("residual_probability")
+.addEventListener("change", calculateResidualScore);
+
+document.getElementById("residual_impact")
+.addEventListener("change", calculateResidualScore);
+
+calculateResidualScore();
+</script>
+
+
 
 {% endblock %}

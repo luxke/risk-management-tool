@@ -63,6 +63,7 @@ def add_risk():
         cause_of_risk = request.form["cause_of_risk"]
         key_risk_indicator = request.form["key_risk_indicator"]
         existing_controls = request.form["existing_controls"]
+        risk_appetite = request.form["risk_appetite"]
 
         # Department
         if session["role"] == "Admin":
@@ -90,6 +91,7 @@ def add_risk():
                 Score,
                 key_risk_indicator,
                 existing_controls,
+                risk_appetite,
                 status_id,
                 Owner_id,
                 department_id,
