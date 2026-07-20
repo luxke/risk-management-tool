@@ -12,7 +12,7 @@ Edit Risk
 
 <div class="card shadow">
 
-<div class="card-header bg-warning text-dark">
+<div class="card-header bg-primary text-white">
 
 <h3 class="mb-0">Edit Risk</h3>
 
@@ -53,10 +53,14 @@ required>{{ risk.Description }}</textarea>
 
 <label class="form-label">Department</label>
 
+{% if session["role"] == "Admin" %}
+
 <select
 name="department_id"
 class="form-select"
 required>
+
+<option value="">Select Department</option>
 
 {% for department in departments %}
 
@@ -72,6 +76,16 @@ value="{{ department.department_id }}"
 
 </select>
 
+{% else %}
+
+<input
+type="text"
+class="form-control"
+value="{{ departments[0].department_name }}"
+readonly>
+
+{% endif %}
+
 </div>
 
 <div class="col-md-6 mb-3">
@@ -82,6 +96,8 @@ value="{{ department.department_id }}"
 name="category_id"
 class="form-select"
 required>
+
+<option value="">Select Category</option>
 
 {% for category in categories %}
 
@@ -101,28 +117,254 @@ value="{{ category.category_id }}"
 
 </div>
 
+<div class="mb-3">
+    <label class="form-label">Risk Reference</label>
+    <input type="text"
+           name="risk_reference"
+           class="form-control"
+           placeholder="{{ risk.risk_reference }}"
+           required>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Strategic Objective</label>
+    <textarea
+      name="strategic_objective"
+      class="form-control"
+      rows="3"
+      required>{{ risk.strategic_objective }}</textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Cause of Risk</label>
+    <textarea
+      name="cause_of_risk"
+      class="form-control"
+      rows="3">{{ risk.cause_of_risk }}</textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Key Risk Indicator</label>
+        <textarea
+    name="key_risk_indicator"
+    class="form-control"
+    rows="2">{{ risk.key_risk_indicator }}</textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Existing Controls</label>
+
+    <textarea
+      name="existing_controls"
+      class="form-control"
+      rows="3">{{ risk.existing_controls }}</textarea>
+
+    <div class="row mt-3">
+
+        <div class="col-md-6">
+
+            <label class="form-label">Control Effectiveness</label>
+
+            <select
+              name="control_effectiveness"
+              class="form-select">
+
+              <option value="">Select</option>
+
+              <option value="Effective"
+              {% if risk.control_effectiveness=="Effective" %}selected{% endif %}>
+              Effective
+              </option>
+
+              <option value="Partially Effective"
+              {% if risk.control_effectiveness=="Partially Effective" %}selected{% endif %}>
+              Partially Effective
+              </option>
+
+              <option value="Ineffective"
+              {% if risk.control_effectiveness=="Ineffective" %}selected{% endif %}>
+              Ineffective
+              </option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <label class="form-label">Control Owner</label>
+
+           <input
+            type="text"
+            name="control_owner"
+            class="form-control"
+            value="{{ risk.control_owner }}">
+
+        </div>
+
+    </div>
+
+</div>
+
+<hr>
+
+<h5 class="mb-3">
+Risk Assessment
+</h5>
+
+<div class="row">
+
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Risk Owner</label>
+
+        {% if session["role"] == "Admin" %}
+            <input
+                type="text"
+                class="form-control"
+                value="Will be assigned later"
+                readonly>
+        {% else %}
+            <input
+                type="text"
+                class="form-control"
+                value="{{ session['full_name'] }}"
+                readonly>
+        {% endif %}
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Risk Appetite</label>
+
+        <select
+          name="risk_appetite"
+          class="form-select">
+
+          <option value="Low"
+          {% if risk.risk_appetite=="Low" %}selected{% endif %}>
+          Low
+          </option>
+
+          <option value="Medium"
+          {% if risk.risk_appetite=="Medium" %}selected{% endif %}>
+          Medium
+          </option>
+
+          <option value="High"
+          {% if risk.risk_appetite=="High" %}selected{% endif %}>
+          High
+          </option>
+
+        </select>
+    </div>
+
+</div>
+
+<hr>
+
+<h5 class="mb-3 text-primary">
+Risk Treatment
+</h5>
+
+<div class="mb-3">
+
+<label class="form-label">
+Treatment Strategy
+</label>
+
+<select
+    name="treatment_strategy"
+    class="form-select">
+
+    <option value="">Select Strategy</option>
+
+    <option value="Avoid"
+    {% if risk.treatment_strategy=="Avoid" %}selected{% endif %}>
+    Avoid
+    </option>
+
+    <option value="Reduce"
+    {% if risk.treatment_strategy=="Reduce" %}selected{% endif %}>
+    Reduce
+    </option>
+
+    <option value="Transfer"
+    {% if risk.treatment_strategy=="Transfer" %}selected{% endif %}>
+    Transfer
+    </option>
+
+    <option value="Accept"
+    {% if risk.treatment_strategy=="Accept" %}selected{% endif %}>
+    Accept
+    </option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+Action Plan
+</label>
+
+  <textarea
+  name="action_plan"
+  rows="3"
+  class="form-control">{{ risk.action_plan }}</textarea>
+
+</div>
+
 <div class="row">
 
 <div class="col-md-6 mb-3">
 
-<label class="form-label">Probability</label>
+<label class="form-label">
+Review Date
+</label>
+
+<input
+type="date"
+name="review_date"
+class="form-control"
+value="{{ risk.review_date }}">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label class="form-label">
+Target Closure Date
+</label>
+
+<input
+type="date"
+name="target_closure_date"
+class="form-control"
+value="{{ risk.target_closure_date }}">
+
+</div>
+
+</div>
+
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+
+<label class="form-label">Probability (1-5)</label>
 
 <select
 name="probability"
 class="form-select"
 required>
 
-{% for i in range(1,6) %}
+<option value="">Select</option>
 
-<option
-value="{{ i }}"
-{% if i == risk.Probability %}selected{% endif %}>
-
-{{ i }}
-
-</option>
-
-{% endfor %}
+<option value="1">1 - Very Low</option>
+<option value="2">2 - Low</option>
+<option value="3">3 - Medium</option>
+<option value="4">4 - High</option>
+<option value="5">5 - Very High</option>
 
 </select>
 
@@ -130,30 +372,96 @@ value="{{ i }}"
 
 <div class="col-md-6 mb-3">
 
-<label class="form-label">Impact</label>
+<label class="form-label">Impact (1-5)</label>
 
 <select
 name="impact"
 class="form-select"
 required>
 
-{% for i in range(1,6) %}
+<option value="">Select</option>
 
-<option
-value="{{ i }}"
-{% if i == risk.Impact %}selected{% endif %}>
-
-{{ i }}
-
-</option>
-
-{% endfor %}
+<option value="1">1 - Very Low</option>
+<option value="2">2 - Low</option>
+<option value="3">3 - Medium</option>
+<option value="4">4 - High</option>
+<option value="5">5 - Very High</option>
 
 </select>
 
 </div>
 
 </div>
+
+<hr>
+
+<h5 class="text-success mb-3">
+Residual Risk Assessment
+</h5>
+
+<div class="row">
+
+<div class="col-md-4 mb-3">
+
+<label class="form-label">
+Residual Probability
+</label>
+
+<select
+name="residual_probability"
+id="residual_probability"
+class="form-select">
+
+<option value="">Select</option>
+<option value="1">1 - Very Low</option>
+<option value="2">2 - Low</option>
+<option value="3">3 - Medium</option>
+<option value="4">4 - High</option>
+<option value="5">5 - Very High</option>
+
+</select>
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label class="form-label">
+Residual Impact
+</label>
+
+<select
+name="residual_impact"
+id="residual_impact"
+class="form-select">
+
+<option value="">Select</option>
+<option value="1">1 - Very Low</option>
+<option value="2">2 - Low</option>
+<option value="3">3 - Medium</option>
+<option value="4">4 - High</option>
+<option value="5">5 - Very High</option>
+
+</select>
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label class="form-label">
+Residual Score
+</label>
+
+<input
+type="number"
+id="residual_score"
+name="residual_score"
+class="form-control"
+readonly>
+
+</div>
+
+</div>
+
 
 <div class="d-flex justify-content-end">
 
@@ -165,9 +473,9 @@ Cancel
 
 <button
 type="submit"
-class="btn btn-warning">
+class="btn btn-primary">
 
-Update Risk
+Save Changes
 
 </button>
 
@@ -182,5 +490,31 @@ Update Risk
 </div>
 
 </div>
+
+<script>
+
+function calculateResidualScore(){
+
+    let probability =
+        Number(document.getElementById("residual_probability").value);
+
+    let impact =
+        Number(document.getElementById("residual_impact").value);
+
+    document.getElementById("residual_score").value =
+        probability * impact;
+
+}
+
+document.getElementById("residual_probability")
+.addEventListener("change", calculateResidualScore);
+
+document.getElementById("residual_impact")
+.addEventListener("change", calculateResidualScore);
+
+calculateResidualScore();
+</script>
+
+
 
 {% endblock %}

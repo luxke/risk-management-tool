@@ -57,13 +57,21 @@ def add_risk():
         description = request.form["description"]
         probability = int(request.form["probability"])
         impact = int(request.form["impact"])
-
         risk_reference = request.form["risk_reference"]
         strategic_objective = request.form["strategic_objective"]
         cause_of_risk = request.form["cause_of_risk"]
         key_risk_indicator = request.form["key_risk_indicator"]
         existing_controls = request.form["existing_controls"]
         risk_appetite = request.form["risk_appetite"]
+        control_effectiveness = request.form["control_effectiveness"]
+        control_owner = request.form["control_owner"]
+        treatment_strategy = request.form["treatment_strategy"]
+        action_plan = request.form["action_plan"]
+        review_date = request.form["review_date"]
+        target_closure_date = request.form["target_closure_date"]
+        residual_probability = request.form["residual_probability"] or None
+        residual_impact = request.form["residual_impact"] or None
+        residual_score = request.form["residual_score"] or None
 
         # Department
         if session["role"] == "Admin":
@@ -92,6 +100,15 @@ def add_risk():
                 key_risk_indicator,
                 existing_controls,
                 risk_appetite,
+                control_effectiveness
+                control_owner
+                treatment_strategy
+                action_plan
+                review_date
+                target_closure_date            
+                residual_probability
+                residual_impact
+                residual_score                     
                 status_id,
                 Owner_id,
                 department_id,
@@ -99,7 +116,7 @@ def add_risk():
                 created_by
             )
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
             risk_reference,
             strategic_objective,
@@ -111,6 +128,16 @@ def add_risk():
             score,
             key_risk_indicator,
             existing_controls,
+            risk_appetite,
+            control_effectiveness,
+            control_owner,
+            treatment_strategy,
+            action_plan,
+            review_date,
+            target_closure_date,
+            residual_probability,
+            residual_impact,
+            residual_score,
             1,          # Open
             None,       # No owner yet
             department_id,

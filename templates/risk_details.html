@@ -8,221 +8,378 @@ Risk Details
 
 <div class="container-fluid">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2>
-            Risk Details
-        </h2>
+    <h2>
+        {{ risk.risk_reference }} - {{ risk.Tittle }}
+    </h2>
 
-        <a href="/" class="btn btn-secondary">
-            ← Back to Dashboard
-        </a>
+    <a href="/" class="btn btn-secondary">
+        ← Back
+    </a>
 
-    </div>
+</div>
 
-    <!-- Header Card -->
 
-    <div class="card shadow mb-4">
+<!-- ===================== -->
+<!-- GENERAL INFORMATION -->
+<!-- ===================== -->
 
-        <div class="card-header bg-primary text-white">
+<div class="card shadow mb-4">
 
-            <h4 class="mb-0">
-                {{ risk.risk_reference }}
-            </h4>
+<div class="card-header bg-primary text-white">
+General Information
+</div>
 
-        </div>
+<div class="card-body">
 
-        <div class="card-body">
+<div class="row">
 
-            <div class="row">
+<div class="col-md-4 mb-3">
+<strong>Reference</strong><br>
+{{ risk.risk_reference }}
+</div>
 
-                <div class="col-md-6">
+<div class="col-md-4 mb-3">
+<strong>Status</strong><br>
+<span class="badge bg-primary">
+{{ risk.status_name }}
+</span>
+</div>
 
-                    <p><strong>Title</strong></p>
+<div class="col-md-4 mb-3">
+<strong>Risk Appetite</strong><br>
+{{ risk.risk_appetite }}
+</div>
 
-                    <p>{{ risk.Tittle }}</p>
+<div class="col-md-4 mb-3">
+<strong>Department</strong><br>
+{{ risk.department_name }}
+</div>
 
-                </div>
+<div class="col-md-4 mb-3">
+<strong>Category</strong><br>
+{{ risk.category_name }}
+</div>
 
-                <div class="col-md-6">
+<div class="col-md-4 mb-3">
+<strong>Risk Owner</strong><br>
 
-                    <p><strong>Status</strong></p>
+{% if risk.full_name %}
+{{ risk.full_name }}
+{% else %}
+<span class="text-danger">Not Assigned</span>
+{% endif %}
 
-                    <span class="badge bg-primary">
-                        {{ risk.status_name }}
-                    </span>
+</div>
 
-                </div>
+</div>
 
-                <div class="col-md-6 mt-3">
+</div>
 
-                    <p><strong>Department</strong></p>
+</div>
 
-                    <p>{{ risk.department_name }}</p>
 
-                </div>
+<!-- ===================== -->
+<!-- DESCRIPTION -->
+<!-- ===================== -->
 
-                <div class="col-md-6 mt-3">
+<div class="card shadow mb-4">
 
-                    <p><strong>Category</strong></p>
+<div class="card-header bg-dark text-white">
+Risk Description
+</div>
 
-                    <p>{{ risk.category_name }}</p>
+<div class="card-body">
 
-                </div>
+<h6>Strategic Objective</h6>
 
-                <div class="col-md-6 mt-3">
+<p>
+{{ risk.strategic_objective }}
+</p>
 
-                    <p><strong>Assigned To</strong></p>
+<hr>
 
-                    <p>
-                        {% if risk.full_name %}
-                            {{ risk.full_name }}
-                        {% else %}
-                            <span class="text-danger">Not Assigned</span>
-                        {% endif %}
-                    </p>
+<h6>Description</h6>
 
-                </div>
+<p>
+{{ risk.Description }}
+</p>
 
-            </div>
+<hr>
 
-        </div>
+<h6>Cause of Risk</h6>
 
-    </div>
+<p>
+{{ risk.cause_of_risk }}
+</p>
 
-    <!-- Strategic Objective -->
+<hr>
 
-    <div class="card shadow mb-4">
+<h6>Key Risk Indicator</h6>
 
-        <div class="card-header bg-dark text-white">
+<p>
+{{ risk.key_risk_indicator }}
+</p>
 
-            Strategic Objective
+</div>
 
-        </div>
+</div>
 
-        <div class="card-body">
 
-            {{ risk.strategic_objective }}
+<!-- ===================== -->
+<!-- CONTROLS -->
+<!-- ===================== -->
 
-        </div>
+<div class="card shadow mb-4">
 
-    </div>
+<div class="card-header bg-success text-white">
+Existing Controls
+</div>
 
-    <!-- Risk Description -->
+<div class="card-body">
 
-    <div class="card shadow mb-4">
+<p>
 
-        <div class="card-header bg-dark text-white">
+{{ risk.existing_controls }}
 
-            Risk Description
+</p>
 
-        </div>
+<hr>
 
-        <div class="card-body">
+<div class="row">
 
-            {{ risk.Description }}
+<div class="col-md-6">
 
-        </div>
+<strong>Control Effectiveness</strong><br>
 
-    </div>
+{{ risk.control_effectiveness }}
 
-    <!-- Cause of Risk -->
+</div>
 
-    <div class="card shadow mb-4">
+<div class="col-md-6">
 
-        <div class="card-header bg-dark text-white">
+<strong>Control Owner</strong><br>
 
-            Cause of Risk
+{{ risk.control_owner }}
 
-        </div>
+</div>
 
-        <div class="card-body">
+</div>
 
-            {{ risk.cause_of_risk }}
+</div>
 
-        </div>
+</div>
 
-    </div>
 
-    <!-- Existing Controls -->
+<!-- ===================== -->
+<!-- RISK ASSESSMENT -->
+<!-- ===================== -->
 
-    <div class="card shadow mb-4">
+<div class="card shadow mb-4">
 
-        <div class="card-header bg-dark text-white">
+<div class="card-header bg-danger text-white">
+Initial Risk Assessment
+</div>
 
-            Existing Controls
+<div class="card-body">
 
-        </div>
+<div class="row text-center">
 
-        <div class="card-body">
+<div class="col-md-4">
 
-            {{ risk.existing_controls }}
+<h6>Probability</h6>
 
-        </div>
+<h2>{{ risk.Probability }}</h2>
 
-    </div>
+</div>
 
-    <!-- Key Risk Indicator -->
+<div class="col-md-4">
 
-    <div class="card shadow mb-4">
+<h6>Impact</h6>
 
-        <div class="card-header bg-dark text-white">
+<h2>{{ risk.Impact }}</h2>
 
-            Key Risk Indicator
+</div>
 
-        </div>
+<div class="col-md-4">
 
-        <div class="card-body">
+<h6>Score</h6>
 
-            {{ risk.key_risk_indicator }}
+{% if risk.Score >=15 %}
 
-        </div>
+<span class="badge bg-danger fs-5">
+{{ risk.Score }}
+</span>
 
-    </div>
+{% elif risk.Score >=8 %}
 
-    <!-- Risk Assessment -->
+<span class="badge bg-warning text-dark fs-5">
+{{ risk.Score }}
+</span>
 
-    <div class="card shadow">
+{% else %}
 
-        <div class="card-header bg-danger text-white">
+<span class="badge bg-success fs-5">
+{{ risk.Score }}
+</span>
 
-            Risk Assessment
+{% endif %}
 
-        </div>
+</div>
 
-        <div class="card-body">
+</div>
 
-            <div class="row text-center">
+</div>
 
-                <div class="col-md-4">
+</div>
 
-                    <h6>Probability</h6>
 
-                    <h3>{{ risk.Probability }}</h3>
+<!-- ===================== -->
+<!-- TREATMENT -->
+<!-- ===================== -->
 
-                </div>
+<div class="card shadow mb-4">
 
-                <div class="col-md-4">
+<div class="card-header bg-warning">
+Risk Treatment Plan
+</div>
 
-                    <h6>Impact</h6>
+<div class="card-body">
 
-                    <h3>{{ risk.Impact }}</h3>
+<div class="row">
 
-                </div>
+<div class="col-md-6 mb-3">
 
-                <div class="col-md-4">
+<strong>Treatment Strategy</strong>
 
-                    <h6>Score</h6>
+<p>
 
-                    <h3>{{ risk.Score }}</h3>
+{{ risk.treatment_strategy }}
 
-                </div>
+</p>
 
-            </div>
+</div>
 
-        </div>
+<div class="col-md-6 mb-3">
 
-    </div>
+<strong>Action Plan</strong>
+
+<p>
+
+{{ risk.action_plan }}
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ===================== -->
+<!-- RESIDUAL RISK -->
+<!-- ===================== -->
+
+<div class="card shadow mb-4">
+
+<div class="card-header bg-info text-white">
+Residual Risk Assessment
+</div>
+
+<div class="card-body">
+
+<div class="row text-center">
+
+<div class="col-md-4">
+
+<h6>Residual Probability</h6>
+
+<h3>
+
+{{ risk.residual_probability }}
+
+</h3>
+
+</div>
+
+<div class="col-md-4">
+
+<h6>Residual Impact</h6>
+
+<h3>
+
+{{ risk.residual_impact }}
+
+</h3>
+
+</div>
+
+<div class="col-md-4">
+
+<h6>Residual Score</h6>
+
+<h3>
+
+{{ risk.residual_score }}
+
+</h3>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ===================== -->
+<!-- REVIEW -->
+<!-- ===================== -->
+
+<div class="card shadow">
+
+<div class="card-header bg-secondary text-white">
+Review Information
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<strong>Review Date</strong>
+
+<p>
+
+{{ risk.review_date }}
+
+</p>
+
+</div>
+
+<div class="col-md-6">
+
+<strong>Target Closure Date</strong>
+
+<p>
+
+{{ risk.target_closure_date }}
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
