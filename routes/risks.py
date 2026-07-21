@@ -10,7 +10,7 @@ risks_bp = Blueprint("risks", __name__)
 def add_risk():
 
     # Only Admin and Risk Manager can create risks
-    if session["role"] not in ["Admin","Risk Manager"]:
+    if session["role"] not in ["Admin","Employee"]:
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -283,32 +283,87 @@ def edit_risk(risk_id):
 
     if request.method == "POST":
 
+        # Basic Information
         title = request.form["Tittle"]
         description = request.form["description"]
+        risk_reference = request.form["risk_reference"]
+        strategic_objective = request.form["strategic_objective"]
+        cause_of_risk = request.form["cause_of_risk"]
+        key_risk_indicator = request.form["key_risk_indicator"]
+        existing_controls = request.form["existing_controls"]
+
+        # Controls
+        control_effectiveness = request.form["control_effectiveness"]
+        control_owner = request.form["control_owner"]
+
+        # Risk Assessment
         probability = int(request.form["probability"])
         impact = int(request.form["impact"])
+        score = probability * impact
+        risk_appetite = request.form["risk_appetite"]
+
+        # Treatment
+        treatment_strategy = request.form["treatment_strategy"]
+        action_plan = request.form["action_plan"]
+        review_date = request.form["review_date"] or None
+        target_closure_date = request.form["target_closure_date"] or None
+
+        # Residual Risk
+        residual_probability = request.form["residual_probability"] or None
+        residual_impact = request.form["residual_impact"] or None
+        residual_score = request.form["residual_score"] or None
+
+        # Department & Category
         department_id = request.form["department_id"]
         category_id = request.form["category_id"]
-
-        score = probability * impact
 
         cursor.execute("""
             UPDATE risks
             SET
+                risk_reference=%s,
+                strategic_objective=%s,
                 Tittle=%s,
                 Description=%s,
+                cause_of_risk=%s,
                 Probability=%s,
                 Impact=%s,
                 Score=%s,
+                key_risk_indicator=%s,
+                existing_controls=%s,
+                control_effectiveness=%s,
+                control_owner=%s,
+                risk_appetite=%s,
+                treatment_strategy=%s,
+                action_plan=%s,
+                review_date=%s,
+                target_closure_date=%s,
+                residual_probability=%s,
+                residual_impact=%s,
+                residual_score=%s,
                 department_id=%s,
                 category_id=%s
             WHERE Risk_id=%s
         """, (
+            risk_reference,
+            strategic_objective,
             title,
             description,
+            cause_of_risk,
             probability,
             impact,
             score,
+            key_risk_indicator,
+            existing_controls,
+            control_effectiveness,
+            control_owner,
+            risk_appetite,
+            treatment_strategy,
+            action_plan,
+            review_date,
+            target_closure_date,
+            residual_probability,
+            residual_impact,
+            residual_score,
             department_id,
             category_id,
             risk_id

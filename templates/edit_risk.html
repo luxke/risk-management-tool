@@ -358,13 +358,17 @@ name="probability"
 class="form-select"
 required>
 
-<option value="">Select</option>
+{% for i in range(1,6) %}
 
-<option value="1">1 - Very Low</option>
-<option value="2">2 - Low</option>
-<option value="3">3 - Medium</option>
-<option value="4">4 - High</option>
-<option value="5">5 - Very High</option>
+<option
+value="{{ i }}"
+{% if i == risk.Probability %}selected{% endif %}>
+
+{{ i }} - {{ ["","Very Low","Low","Medium","High","Very High"][i] }}
+
+</option>
+
+{% endfor %}
 
 </select>
 
@@ -379,13 +383,17 @@ name="impact"
 class="form-select"
 required>
 
-<option value="">Select</option>
+{% for i in range(1,6) %}
 
-<option value="1">1 - Very Low</option>
-<option value="2">2 - Low</option>
-<option value="3">3 - Medium</option>
-<option value="4">4 - High</option>
-<option value="5">5 - Very High</option>
+<option
+value="{{ i }}"
+{% if i == risk.Impact %}selected{% endif %}>
+
+{{ i }} - {{ ["","Very Low","Low","Medium","High","Very High"][i] }}
+
+</option>
+
+{% endfor %}
 
 </select>
 
@@ -412,12 +420,17 @@ name="residual_probability"
 id="residual_probability"
 class="form-select">
 
-<option value="">Select</option>
-<option value="1">1 - Very Low</option>
-<option value="2">2 - Low</option>
-<option value="3">3 - Medium</option>
-<option value="4">4 - High</option>
-<option value="5">5 - Very High</option>
+{% for i in range(1,6) %}
+
+<option
+value="{{ i }}"
+{% if i == risk.residual_probability %}selected{% endif %}>
+
+{{ i }} - {{ ["","Very Low","Low","Medium","High","Very High"][i] }}
+
+</option>
+
+{% endfor %}
 
 </select>
 
@@ -434,12 +447,17 @@ name="residual_impact"
 id="residual_impact"
 class="form-select">
 
-<option value="">Select</option>
-<option value="1">1 - Very Low</option>
-<option value="2">2 - Low</option>
-<option value="3">3 - Medium</option>
-<option value="4">4 - High</option>
-<option value="5">5 - Very High</option>
+{% for i in range(1,6) %}
+
+<option
+value="{{ i }}"
+{% if i == risk.residual_impact %}selected{% endif %}>
+
+{{ i }} - {{ ["","Very Low","Low","Medium","High","Very High"][i] }}
+
+</option>
+
+{% endfor %}
 
 </select>
 
@@ -456,6 +474,7 @@ type="number"
 id="residual_score"
 name="residual_score"
 class="form-control"
+value="{{ risk.residual_score }}"
 readonly>
 
 </div>
