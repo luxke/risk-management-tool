@@ -1,7 +1,14 @@
 from flask import Flask
+from flask_mail import Mail
+from config import Config       
 
 app = Flask(__name__)
 app.secret_key = "RiskManagementSecretKey2026"
+
+app.config.from_object(Config)
+
+mail = Mail(app)
+
 
 from services.context_processor import notification_count
 app.context_processor(notification_count)
@@ -28,15 +35,16 @@ app.register_blueprint(reports_bp)
 app.register_blueprint(notifications_bp)
 
 
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-
-
 
 
 

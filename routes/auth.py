@@ -8,6 +8,9 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
 
+    if "user_id" in session:
+        return redirect("/")
+
     if request.method == 'POST':
 
         email = request.form['email']
@@ -56,4 +59,14 @@ def logout():
 
     session.clear()
 
-    return redirect('/login')
+    response = redirect('/login')
+
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    return response
+
+
+
+

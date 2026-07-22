@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -126,7 +126,7 @@ body::before{
 
     border-color:#198754;
 
-    box-shadow:0 0 8px rgba(25,135,84,.3);
+    box-shadow:0 0 200px rgba(25,135,84,.3);
 
 }
 
@@ -187,7 +187,7 @@ to{
 }
 
 }
-
+/*
 #togglePassword{
 
     border-radius:0 12px 12px 0;
@@ -212,7 +212,7 @@ to{
 
     box-shadow:none;
 
-}
+}*/
 
 </style>
 
@@ -344,8 +344,462 @@ togglePassword.addEventListener("click", function(){
 
 </body>
 
-</html>
+</html> -->
 
        
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Risk Management System</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+
+body{
+
+    margin:0;
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-family:'Segoe UI',sans-serif;
+
+    background:
+    linear-gradient(
+        rgba(8,45,20,.80),
+        rgba(12,80,38,.78)
+    ),
+    linear-gradient(
+        135deg,
+        #0b4f2d,
+        #19743b,
+        #dfeedd
+    );
+
+    overflow:hidden;
+
+}
+
+/* Background Logo */
+body::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:700px;
+    height:700px;
+
+    background:url("{{ url_for('static', filename='images/institution_logo.png') }}");
+
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:contain;
+
+    opacity:.08;
+
+    z-index:0;
+
+}
+
+/* Login Card */
+
+.login-card{
+
+    position:relative;
+
+    width:460px;
+
+    padding:45px;
+
+    border-radius:22px;
+
+    background:rgb(255, 255, 255);
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:
+        0 30px 70px rgba(0,0,0,.30);
+
+    border:1px solid rgba(255,255,255,.4);
+
+    z-index:2;
+
+}
+
+.logo{
+
+    width:130px;
+
+    display:block;
+
+    margin:auto;
+
+    margin-bottom:15px;
+
+}
+
+.system-title{
+
+    text-align:center;
+
+    color:#146c43;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    margin-bottom:5px;
+
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#6c757d;
+
+    font-size:15px;
+
+    margin-bottom:35px;
+
+}
+
+/* ===========================
+   Floating Input Fields
+=========================== */
+
+.floating-input{
+
+    position:relative;
+
+    margin-bottom:28px;
+
+}
+
+.floating-input input{
+
+    width:100%;
+    height:56px;
+
+    padding:18px 50px 18px 16px;
+
+    border:1.5px solid #d6d6d6;
+
+    border-radius:12px;
+
+    outline:none;
+
+    background:#fff;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.floating-input input:focus{
+
+    border-color:#198754;
+
+    box-shadow:0 0 8px rgba(25,135,84,.18);
+
+}
+
+.floating-input label{
+
+    position:absolute;
+
+    left:15px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    background:white;
+
+    color:#777;
+
+    padding:0 6px;
+
+    pointer-events:none;
+
+    transition:.25s ease;
+
+}
+
+.floating-input input:focus + label,
+.floating-input input:not(:placeholder-shown) + label{
+
+    top:0;
+
+    font-size:13px;
+
+    color:#198754;
+
+    font-weight:600;
+
+}
+
+/* Hide placeholder */
+
+.floating-input input::placeholder{
+
+    color:transparent;
+
+}
+
+/* ===========================
+   Password Eye
+=========================== */
+
+.password-box{
+
+    position:relative;
+
+}
+
+.password-box input{
+
+    padding-right:48px;
+
+}
+
+#togglePassword{
+
+    position:absolute;
+
+    right:15px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    border:none;
+
+    background:transparent;
+
+    color:#6c757d;
+
+    padding:0;
+
+    cursor:pointer;
+
+}
+
+#togglePassword:hover{
+
+    color:#198754;
+
+}
+
+#togglePassword:focus{
+
+    outline:none;
+
+    box-shadow:none;
+
+}
+
+
+
+/* ===========================
+   Login Button
+=========================== */
+
+.btn-login{
+
+    height:54px;
+
+    background:#198754;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    font-size:17px;
+
+    transition:.3s;
+
+}
+
+
+
+.btn-login:hover{
+
+    background:#146c43;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 20px rgba(25,135,84,.25);
+
+}
+    
+.footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:13px;
+    color:#666;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-card">
+
+    <img
+        src="{{ url_for('static', filename='images/institution_logo.png') }}"
+        class="logo">
+
+    <h3 class="system-title">
+
+        Risk Management System
+
+    </h3>
+
+    <p class="subtitle">
+
+        Secure Access Portal
+
+    </p>
+
+    <form method="POST">
+
+    <!-- Email -->
+
+    <div class="floating-input mb-4">
+
+        <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder=" "
+            required>
+
+        <label for="email">
+            Email Address
+        </label>
+
+    </div>
+
+    <!-- Password -->
+
+    <div class="floating-input mb-4 password-box">
+
+    <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder=" "
+        autocomplete="new-password"
+        required>
+
+    <label for="password">
+        Password
+    </label>
+
+    <button
+        type="button"
+        id="togglePassword">
+
+        <i class="bi bi-eye-fill" id="eyeIcon"></i>
+
+    </button>
+
+</div>
+
+    <button class="btn btn-login w-100">
+        Login
+    </button>
+
+</form>
+
+    <div class="footer">
+
+        Risk Management System<br>
+
+        © 2026 All Rights Reserved 
+
+    </div>
+
+</div>
+
+<script>
+
+const password = document.getElementById("password");
+
+const togglePassword = document.getElementById("togglePassword");
+
+const eyeIcon = document.getElementById("eyeIcon");
+
+togglePassword.addEventListener("click", function(){
+
+    if(password.type === "password"){
+
+        password.type = "text";
+
+        eyeIcon.classList.remove("bi-eye-fill");
+        eyeIcon.classList.add("bi-eye-slash-fill");
+
+    }else{
+
+        password.type = "password";
+
+        eyeIcon.classList.remove("bi-eye-slash-fill");
+        eyeIcon.classList.add("bi-eye-fill");
+
+    }
+
+});
+
+</script>
+
+<script>
+
+window.onload = function () {
+
+    document.querySelector("form").reset();
+
+}
+
+</script>
+
+<script>
+
+window.onload = function () {
+
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+
+}
+
+</script>
+
+</body>
+
+</html> 
+
+       
+
+
+
 
 
