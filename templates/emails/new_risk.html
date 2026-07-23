@@ -1,0 +1,65 @@
+<h2>
+
+Hello {{ manager_name }},
+
+</h2>
+
+<p>
+
+A new risk has been registered in your department.
+
+</p>
+
+<div class="info-box">
+
+<table>
+
+<tr>
+
+<td><strong>Reference</strong></td>
+
+<td>{{ risk_reference }}</td>
+
+</tr>
+
+<tr>
+
+<td><strong>Risk Title</strong></td>
+
+<td>{{ title }}</td>
+
+</tr>
+
+<tr>
+
+<td><strong>Department</strong></td>
+
+<td>{{ department }}</td>
+
+</tr>
+
+<tr>
+
+<td><strong>Risk Score</strong></td>
+
+<td>{{ score }}</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<p>
+
+Please log into the Risk Management System to review and assign this risk.
+
+</p>
+
+ <a
+href="{{ url }}"
+class="button">
+
+View Risk 
+
+</a>

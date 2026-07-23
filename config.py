@@ -1,16 +1,19 @@
 import os
+from dotenv import load_dotenv
+
+loaded = load_dotenv()
+
 
 class Config:
 
-    MAIL_SERVER = "smtp.gmail.com"
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
+    SECRET_KEY = "RiskManagementSecretKey2026"
 
-    MAIL_USERNAME = "your_email@gmail.com"
-    MAIL_PASSWORD = "YOUR_APP_PASSWORD"
+    MAIL_SERVER = os.getenv("MAIL_SERVER")
+    MAIL_PORT = int(os.getenv("MAIL_PORT"))
 
-    MAIL_DEFAULT_SENDER = (
-        "Risk Management System",
-        "your_email@gmail.com"
-    )
+    MAIL_USE_TLS = os.getenv("MAIL_USE_TLS") == "True"
+
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
+
+    MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")

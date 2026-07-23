@@ -69,4 +69,22 @@ def logout():
 
 
 
+from services.email_service import send_email
 
+
+@auth_bp.route("/test-email")
+def test_email():
+
+    send_email(
+        recipient="riskmanagementsystem2026@gmail.com",
+        subject="Risk Management System",
+        body="""
+Congratulations!
+
+Your Risk Management System can now send emails successfully.
+
+This is your first test email.
+"""
+    )
+
+    return "Email Sent Successfully!"

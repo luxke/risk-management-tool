@@ -1,13 +1,11 @@
 from flask import Flask
-from flask_mail import Mail
-from config import Config       
+from config import Config
+from extensions import mail
 
 app = Flask(__name__)
-app.secret_key = "RiskManagementSecretKey2026"
-
 app.config.from_object(Config)
 
-mail = Mail(app)
+mail.init_app(app)
 
 
 from services.context_processor import notification_count
