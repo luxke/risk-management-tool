@@ -11,7 +11,7 @@ risks_bp = Blueprint("risks", __name__)
 def add_risk():
 
     # Only Admin and Risk Manager can create risks
-    if session["role"] not in ["Admin","Risk Manager"]:
+    if session["role"] not in ["Admin","Employee"]:
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -147,13 +147,14 @@ def add_risk():
         ))
 
         conn.commit()
-
+        risk_id = cursor.lastrowid
         # ==========================
         # Notify Risk Manager
         # ==========================
 
         cursor.execute("""
             SELECT
+                u.user_id,
                 u.full_name,
                 u.email,
                 d.department_name
@@ -185,6 +186,22 @@ def add_risk():
                 "emails/base_email.html",
                 body=html
             )
+            cursor.execute("""
+                INSERT INTO notifications
+                (
+                    user_id,
+                    risk_id,
+                    message
+                )
+                VALUES
+                (%s,%s,%s)
+            """,(
+                manager["user_id"],
+                risk_id,
+                f"A new risk ({risk_reference}) has been assigned to your department."
+            ))
+
+            conn.commit()
 
             send_email(
                 recipient=manager["email"],

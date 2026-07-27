@@ -32,9 +32,9 @@ def notifications():
         notifications=notifications
     )
 
-from flask import redirect
+from flask import jsonify
 
-@notifications_bp.route("/mark-notification/<int:notification_id>")
+@notifications_bp.route("/mark-notification/<int:notification_id>", methods=["POST"])
 @login_required
 def mark_notification(notification_id):
 
@@ -46,12 +46,16 @@ def mark_notification(notification_id):
         SET is_read = 1
         WHERE notification_id = %s
         AND user_id = %s
-    """, (notification_id, session["user_id"]))
+    """, (
+        notification_id,
+        session["user_id"]
+    ))
 
     conn.commit()
     conn.close()
 
-    return redirect("/notifications")
-
+    return jsonify({
+        "success": True
+    })
 
 

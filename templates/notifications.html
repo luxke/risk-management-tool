@@ -20,7 +20,7 @@ Notifications
 
                 {% for notification in notifications %}
 
-                <div class="list-group-item">
+                <div class="list-group-item" id="notification-{{ notification.notification_id }}">
 
                     <div class="d-flex justify-content-between">
 
@@ -46,12 +46,13 @@ Notifications
 
                         {% if notification.is_read == 0 %}
 
-                        <a href="/mark-notification/{{ notification.notification_id }}"
-                           class="btn btn-sm btn-primary">
+                        <button
+                            class="btn btn-sm btn-primary mark-read"
+                            data-id="{{ notification.notification_id }}">
 
                             Mark Read
 
-                        </a>
+                        </button>
 
                         {% endif %}
 
@@ -76,5 +77,37 @@ Notifications
     </div>
 
 </div>
+
+<script>
+
+document.querySelectorAll(".mark-read").forEach(button => {
+
+    button.addEventListener("click", function(){
+
+        const id = this.dataset.id;
+
+        fetch("/mark-notification/" + id, {
+
+            method:"POST"
+
+        })
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if(data.success){
+
+                location.reload();
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
 
 {% endblock %}
