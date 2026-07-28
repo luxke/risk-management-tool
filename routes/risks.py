@@ -631,6 +631,137 @@ def update_risk(risk_id):
                 session["user_id"]
             ))
 
+    # ======================================
+    # Get Employee details
+    # ======================================
+
+    cursor.execute("""
+        SELECT full_name
+        FROM users
+        WHERE user_id=%s
+    """, (session["user_id"],))
+
+    employee = cursor.fetchone()
+
+    # ======================================
+    # Notify Department Risk Manager
+    # ======================================
+
+    cursor.execute("""
+        SELECT
+            user_id,
+            full_name,
+            email
+        FROM users
+        WHERE
+            department_id=%s
+            AND role='Risk Manager'
+            AND status='Active'
+        LIMIT 1
+    """, (risk["department_id"],))
+
+    manager = cursor.fetchone()
+
+    if manager:
+
+        # Dashboard Notification
+        cursor.execute("""
+            INSERT INTO notifications
+            (
+                user_id,
+                risk_id,
+                message
+            )
+            VALUES
+            (%s,%s,%s)
+        """, (
+            manager["user_id"],
+            risk_id,
+            f"{employee['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
+        ))
+
+        # Email
+        html = render_template(
+            "emails/risk_updated.html",
+            recipient_name=manager["full_name"],
+            intro_message="An employee in your department has updated a risk that you oversee. Please review the latest progress and take any necessary action.",
+            updated_by=employee["full_name"],
+            risk_reference=risk["risk_reference"],
+            status=new_status,
+            notes=progress_notes,
+            url="http://127.0.0.1:5000"
+                )
+        
+
+        page = render_template(
+            "emails/base_email.html",
+            body=html
+        )
+
+        send_email(
+            recipient=manager["email"],
+            subject="Risk Updated",
+            html=page
+        )
+
+    # ======================================
+    # Notify ALL Admins
+    # ======================================
+
+    cursor.execute("""
+        SELECT
+            user_id,
+            full_name,
+            email
+        FROM users
+        WHERE
+            role='Admin'
+            AND status='Active'
+    """)
+
+    admins = cursor.fetchall()
+
+    for admin in admins:
+
+        # Dashboard Notification
+        cursor.execute("""
+            INSERT INTO notifications
+            (
+                user_id,
+                risk_id,
+                message
+            )
+            VALUES
+            (%s,%s,%s)
+        """, (
+            admin["user_id"],
+            risk_id,
+            f"{employee['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
+        ))
+
+        # Email
+        html = render_template(
+            "emails/risk_updated.html",
+            recipient_name=admin["full_name"],
+            intro_message="An employee has updated a risk in the system. This update is provided for your oversight and monitoring.",
+            updated_by=employee["full_name"],
+            risk_reference=risk["risk_reference"],
+            status=new_status,
+            notes=progress_notes,
+            url="http://127.0.0.1:5000"
+        )
+
+        page = render_template(
+            "emails/base_email.html",
+            body=html
+        )
+
+        send_email(
+            recipient=admin["email"],
+            subject="Risk Updated",
+            html=page
+        )
+
         conn.commit()
         conn.close()
 

@@ -20,7 +20,7 @@ from routes.categories import categories_bp
 from routes.audit import audit_bp
 from routes.reports import reports_bp
 from routes.notifications import notifications_bp   
-
+from routes.communications import communications_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
@@ -31,7 +31,7 @@ app.register_blueprint(categories_bp)
 app.register_blueprint(audit_bp)
 app.register_blueprint(reports_bp)
 app.register_blueprint(notifications_bp)
-
+app.register_blueprint(communications_bp)
 
 @app.after_request
 def add_header(response):
@@ -42,7 +42,7 @@ def add_header(response):
 
 
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run( debug=True)
 
 
 

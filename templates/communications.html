@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+Communications
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>
+        📢 Communications
+    </h2>
+
+    <a
+        href="/add-communication"
+        class="btn btn-success">
+
+        + New Communication
+
+    </a>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        {% if communications %}
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Department</th>
+                    <th>Date</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for communication in communications %}
+
+                <tr>
+
+                    <td>{{ communication.title }}</td>
+
+                    <td>
+
+                        <span class="badge bg-primary">
+
+                            {{ communication.communication_type }}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        {% if communication.department_name %}
+
+                            {{ communication.department_name }}
+
+                        {% else %}
+
+                            All Departments
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>{{ communication.created_at }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="alert alert-info">
+
+            No communications have been published.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

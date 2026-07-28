@@ -1,0 +1,69 @@
+<h2 style="color:#198754;">
+    Risk Update Notification
+</h2>
+
+<p>
+    Hello <strong>{{ recipient_name }}</strong>,
+</p>
+
+<p>
+    {{ intro_message }}
+</p>
+
+<table style="width:100%; border-collapse:collapse; margin:20px 0;">
+
+    <tr>
+        <td><strong>Updated By:</strong></td>
+        <td>{{ updated_by }}</td>
+    </tr>
+
+    <tr>
+        <td><strong>Risk Reference:</strong></td>
+        <td>{{ risk_reference }}</td>
+    </tr>
+
+    <tr>
+        <td><strong>Current Status:</strong></td>
+        <td>{{ status }}</td>
+    </tr>
+
+</table>
+
+{% if notes %}
+<p>
+    <strong>Progress Notes</strong>
+</p>
+
+<div style="
+    background:#f8f9fa;
+    border-left:4px solid #198754;
+    padding:15px;
+    border-radius:5px;
+">
+    {{ notes }}
+</div>
+{% endif %}
+
+<p style="margin-top:25px;">
+    Please log in to the Risk Management System to review the latest update.
+</p>
+
+<p style="text-align:center; margin-top:30px;">
+    <a href="{{ url }}"
+       style="
+            background:#198754;
+            color:white;
+            text-decoration:none;
+            padding:12px 24px;
+            border-radius:6px;
+            display:inline-block;
+            font-weight:bold;
+       ">
+        Open Risk Management System
+    </a>
+</p>
+
+<p style="margin-top:30px;">
+    Regards,<br>
+    <strong>Risk Management System</strong>
+</p>
