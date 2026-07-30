@@ -46,7 +46,7 @@ def dashboard():
 
         cursor.execute("""
             SELECT
-                r.Risk_id,
+                r.risk_reference,
                 r.Tittle,
                 r.Description,
                 r.Owner_id,
@@ -115,7 +115,7 @@ def dashboard():
 
         cursor.execute("""
             SELECT
-                r.Risk_id,
+                r.risk_reference,
                 r.Tittle,
                 r.Description,
                 r.Owner_id,
@@ -181,7 +181,7 @@ def dashboard():
 
         cursor.execute("""
             SELECT
-                r.Risk_id,
+                r.risk_reference,
                 r.Tittle,
                 r.Description,
                 r.department_id,

@@ -253,23 +253,23 @@ Risk Analytics
 <thead class="table-dark">
 
 <tr>
+    
+    <th>Risk Reference</th>
+    <th>Title</th>
 
-<th>ID</th>
-<th>Title</th>
+    {% if session["role"] == "Admin" %}
+    <th>Department</th>
+    <th>Assigned To</th>
 
-{% if session["role"] == "Admin" %}
-<th>Department</th>
-<th>Assigned To</th>
+    {% elif session["role"] == "Risk Manager" %}
+    <th>Assigned To</th>
+    {% endif %}
 
-{% elif session["role"] == "Risk Manager" %}
-<th>Assigned To</th>
-{% endif %}
-
-<th>Probability</th>
-<th>Impact</th>
-<th>Score</th>
-<th>Status</th>
-<th>Actions</th>
+    <th>Probability</th>
+    <th>Impact</th>
+    <th>Score</th>
+    <th>Status</th>
+    <th>Actions</th>
 
 </tr>
 
@@ -281,7 +281,11 @@ Risk Analytics
 
 <tr>
 
-<td>{{ risk.Risk_id }}</td>
+    <td>
+        <span class="badge bg-dark">
+            {{ risk.risk_reference }}
+        </span>
+    </td>
 
 <td>{{ risk.Tittle }}</td>
 
