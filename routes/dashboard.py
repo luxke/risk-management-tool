@@ -13,9 +13,9 @@ def dashboard():
     cursor = conn.cursor(dictionary=True)
 
     # ==========================================
-    # ADMIN DASHBOARD
+    # RISK MANAGER DASHBOARD
     # ==========================================
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT COUNT(*) AS total
@@ -46,6 +46,7 @@ def dashboard():
 
         cursor.execute("""
             SELECT
+                r.Risk_id,
                 r.risk_reference,
                 r.Tittle,
                 r.Description,
@@ -78,9 +79,9 @@ def dashboard():
         risks = cursor.fetchall()
 
     # ==========================================
-    # RISK MANAGER DASHBOARD
+    # RISK OWNER DASHBOARD
     # ==========================================
-    elif session["role"] == "Risk Manager":
+    elif session["role"] == "Risk Owner":
 
         cursor.execute("""
             SELECT COUNT(*) AS total
@@ -115,6 +116,7 @@ def dashboard():
 
         cursor.execute("""
             SELECT
+                r.Risk_id,
                 r.risk_reference,
                 r.Tittle,
                 r.Description,
@@ -144,7 +146,7 @@ def dashboard():
         risks = cursor.fetchall()
 
     # ==========================================
-    # EMPLOYEE DASHBOARD
+    # RISK CHAMPION DASHBOARD
     # ==========================================
     else:
 
@@ -181,6 +183,7 @@ def dashboard():
 
         cursor.execute("""
             SELECT
+                r.Risk_id,
                 r.risk_reference,
                 r.Tittle,
                 r.Description,
@@ -206,7 +209,7 @@ def dashboard():
     # STATUS CHART DATA
     # ==========================================
 
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT
@@ -219,7 +222,7 @@ def dashboard():
             ORDER BY rs.status_id
         """)
 
-    elif session["role"] == "Risk Manager":
+    elif session["role"] == "Risk Owner":
 
         cursor.execute("""
             SELECT
@@ -254,7 +257,7 @@ def dashboard():
     # DEPARTMENT CHART
     # ==========================================
 
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT
@@ -287,7 +290,7 @@ def dashboard():
     # CATEGORY CHART
     # ==========================================
 
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT
@@ -300,7 +303,7 @@ def dashboard():
             ORDER BY total DESC
         """)
 
-    elif session["role"] == "Risk Manager":
+    elif session["role"] == "Risk Owner":
 
         cursor.execute("""
             SELECT
@@ -332,7 +335,7 @@ def dashboard():
     # RISK TREND CHART
     # ==========================================
 
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT
@@ -343,7 +346,7 @@ def dashboard():
             ORDER BY DATE(created_at)
         """)
 
-    elif session["role"] == "Risk Manager":
+    elif session["role"] == "Risk Owner":
 
         cursor.execute("""
             SELECT
@@ -373,7 +376,7 @@ def dashboard():
     # TOP 5 HIGHEST RISKS
     # ==========================================
 
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT
@@ -386,7 +389,7 @@ def dashboard():
             LIMIT 5
         """)
 
-    elif session["role"] == "Risk Manager":
+    elif session["role"] == "Risk Owner":
 
         cursor.execute("""
             SELECT

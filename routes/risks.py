@@ -10,8 +10,8 @@ risks_bp = Blueprint("risks", __name__)
 @login_required
 def add_risk():
 
-    # Only Admin and Risk Manager can create risks
-    if session["role"] not in ["Admin","Employee"]:
+    # Only Risk Manager and Risk Champion can create risks
+    if session["role"] not in ["Risk Manager","Risk Champion"]:
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -20,7 +20,7 @@ def add_risk():
     # ==========================
     # Load Departments
     # ==========================
-    if session["role"] == "Admin":
+    if session["role"] == "Risk Manager":
 
         cursor.execute("""
             SELECT *
@@ -75,7 +75,7 @@ def add_risk():
         residual_score = request.form["residual_score"] or None
 
         # Department
-        if session["role"] == "Admin":
+        if session["role"] == "Risk Manager":
             department_id = request.form["department_id"]
         else:
             department_id = session["department_id"]
@@ -149,7 +149,7 @@ def add_risk():
         conn.commit()
         risk_id = cursor.lastrowid
         # ==========================
-        # Notify Risk Manager
+        # Notify Risk Owner
         # ==========================
 
         cursor.execute("""
@@ -163,21 +163,21 @@ def add_risk():
                 ON u.department_id = d.department_id
             WHERE
                 u.department_id = %s
-                AND u.role = 'Risk Manager'
+                AND u.role = 'Risk Owner'
                 AND u.status = 'Active'
             LIMIT 1
         """, (department_id,))
 
-        manager = cursor.fetchone()
+        owner = cursor.fetchone()
 
-        if manager:
+        if owner:
 
             html = render_template(
                 "emails/new_risk.html",
-                manager_name=manager["full_name"],
+                owner_name=owner["full_name"],
                 risk_reference=risk_reference,
                 title=title,
-                department=manager["department_name"],
+                department=owner["department_name"],
                 score=score,
                 url="http://127.0.0.1:5000"
             )
@@ -196,7 +196,7 @@ def add_risk():
                 VALUES
                 (%s,%s,%s)
             """,(
-                manager["user_id"],
+                owner["user_id"],
                 risk_id,
                 f"A new risk ({risk_reference}) has been assigned to your department."
             ))
@@ -204,8 +204,8 @@ def add_risk():
             conn.commit()
 
             send_email(
-                recipient=manager["email"],
-                subject="New Risk Assigned",
+                recipient=owner["email"],
+                subject="New Risk Assigned to Your Department",
                 html=page
             )
 
@@ -221,10 +221,12 @@ def add_risk():
         categories=categories
     )
 
-@risks_bp.route("/assign-risk/<int:risk_id>", methods=["GET", "POST"])
+@risks_bp.route("/assign-risk/[int:risk_id](int:risk_id)", methods=["GET", "POST"])
 @login_required
 def assign_risk(risk_id):
 
+
+    # Only Risk Manager can assign risks
     if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
@@ -235,20 +237,32 @@ def assign_risk(risk_id):
     # Get Selected Risk
     # ==========================
     cursor.execute("""
-        SELECT *
-        FROM risks
-        WHERE Risk_id=%s
+        SELECT
+            r.*,
+            rs.status_name
+        FROM risks r
+        LEFT JOIN risk_status rs
+            ON r.status_id = rs.status_id
+        WHERE r.Risk_id=%s
     """, (risk_id,))
 
     risk = cursor.fetchone()
 
+    if not risk:
+        conn.close()
+        return "Risk not found.", 404
+
+    # ==========================
     # Security Check
+    # ==========================
+    # Risk Manager can only assign
+    # risks belonging to their department
     if risk["department_id"] != session["department_id"]:
         conn.close()
         return "Access Denied", 403
 
     # ==========================
-    # Get Employees
+    # Get Risk Champions
     # ==========================
     cursor.execute("""
         SELECT
@@ -257,12 +271,12 @@ def assign_risk(risk_id):
         FROM users
         WHERE
             department_id=%s
-            AND role='Employee'
+            AND role='Risk Champion'
             AND status='Active'
         ORDER BY full_name
     """, (session["department_id"],))
 
-    employees = cursor.fetchall()
+    champions = cursor.fetchall()
 
     # ==========================
     # Assign Risk
@@ -271,7 +285,34 @@ def assign_risk(risk_id):
 
         owner_id = request.form["owner_id"]
 
-        # Assign employee
+        # ==========================
+        # Verify selected Risk Champion
+        # ==========================
+        cursor.execute("""
+            SELECT
+                user_id,
+                full_name,
+                email
+            FROM users
+            WHERE
+                user_id=%s
+                AND department_id=%s
+                AND role='Risk Champion'
+                AND status='Active'
+        """, (
+            owner_id,
+            session["department_id"]
+        ))
+
+        champion = cursor.fetchone()
+
+        if not champion:
+            conn.close()
+            return "Invalid Risk Champion.", 400
+
+        # ==========================
+        # Assign Risk Champion
+        # ==========================
         cursor.execute("""
             UPDATE risks
             SET
@@ -282,19 +323,6 @@ def assign_risk(risk_id):
             owner_id,
             risk_id
         ))
-
-        # ==========================
-        # Get Employee Details
-        # ==========================
-        cursor.execute("""
-            SELECT
-                full_name,
-                email
-            FROM users
-            WHERE user_id=%s
-        """, (owner_id,))
-
-        employee = cursor.fetchone()
 
         # ==========================
         # Create System Notification
@@ -313,35 +341,33 @@ def assign_risk(risk_id):
                 %s
             )
         """, (
-            owner_id,
+            champion["user_id"],
             risk_id,
-            f"You have been assigned Risk #{risk_id}. Please review and begin mitigation."
+            f"You have been assigned Risk {risk['risk_reference']}. Please review and begin mitigation."
         ))
 
         # ==========================
         # Send Email Notification
         # ==========================
-        if employee:
+        html = render_template(
+            "emails/employee_assignment.html",
+            employee_name=champion["full_name"],
+            risk_reference=risk["risk_reference"],
+            title=risk["Tittle"],
+            score=risk["Score"],
+            url="http://127.0.0.1:5000"
+        )
 
-            html = render_template(
-                "emails/employee_assignment.html",
-                employee_name=employee["full_name"],
-                risk_reference=risk["risk_reference"],
-                title=risk["Tittle"],
-                score=risk["Score"],
-                url="http://127.0.0.1:5000"
-            )
+        page = render_template(
+            "emails/base_email.html",
+            body=html
+        )
 
-            page = render_template(
-                "emails/base_email.html",
-                body=html
-            )
-
-            send_email(
-                recipient=employee["email"],
-                subject="Risk Assigned To You",
-                html=page
-            )
+        send_email(
+            recipient=champion["email"],
+            subject="Risk Assigned To You",
+            html=page
+        )
 
         conn.commit()
         conn.close()
@@ -353,8 +379,9 @@ def assign_risk(risk_id):
     return render_template(
         "assign_risk.html",
         risk=risk,
-        employees=employees
+        champions=champions
     )
+
 @risks_bp.route("/edit-risk/<int:risk_id>", methods=["GET", "POST"])
 @login_required
 def edit_risk(risk_id):

@@ -10,116 +10,153 @@ Assign Risk
 
 <div class="col-md-8">
 
-<div class="card shadow">
+    <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white">
 
-<h4>Assign Risk to Employee</h4>
+            <h4>
+                Assign Risk to Risk Champion
+            </h4>
 
-</div>
+        </div>
 
-<div class="card-body">
+        <div class="card-body">
 
-<div class="mb-4">
+            <!-- Risk Information -->
 
-<h5>{{ risk.Tittle }}</h5>
+            <div class="mb-4">
 
-<p class="text-muted">
-{{ risk.Description }}
-</p>
+                <h5>
+                    {{ risk.Tittle }}
+                </h5>
 
-<hr>
+                <p class="text-muted">
+                    {{ risk.Description }}
+                </p>
 
-<div class="row">
+                <hr>
 
-<div class="col-md-6">
+                <div class="row">
 
-<strong>Department:</strong><br>
+                    <div class="col-md-6">
 
-{{ session["department_name"] }}
+                        <strong>Risk Reference:</strong><br>
 
-</div>
+                        <span class="badge bg-dark">
+                            {{ risk.risk_reference }}
+                        </span>
 
-<div class="col-md-6">
+                    </div>
 
-<strong>Current Status:</strong><br>
+                    <div class="col-md-6">
 
-<span class="badge bg-warning text-dark">
+                        <strong>Department:</strong><br>
 
-{{ risk.status }}
+                        {{ session["department_name"] }}
 
-</span>
+                    </div>
 
-</div>
+                </div>
 
-</div>
+                <div class="row mt-3">
 
-</div>
+                    <div class="col-md-6">
 
-<form method="POST">
+                        <strong>Current Status:</strong><br>
 
-<div class="mb-3">
+                        <span class="badge bg-warning text-dark">
 
-<label class="form-label">
+                            {{ risk.status_name }}
 
-Assign Employee
+                        </span>
 
-</label>
+                    </div>
 
-<select
-name="owner_id"
-class="form-select"
-required>
+                    <div class="col-md-6">
 
-<option value="">
+                        <strong>Risk Score:</strong><br>
 
--- Select Employee --
+                        <span class="badge bg-danger">
 
-</option>
+                            {{ risk.Score }}
 
-{% for employee in employees %}
+                        </span>
 
-<option value="{{ employee.user_id }}">
+                    </div>
 
-{{ employee.full_name }}
+                </div>
 
-</option>
+            </div>
 
-{% endfor %}
 
-</select>
+            <!-- Assign Risk Champion -->
 
-</div>
+            <form method="POST">
 
-<div class="d-flex gap-2">
+                <div class="mb-3">
 
-<button
-type="submit"
-class="btn btn-success">
+                    <label class="form-label fw-bold">
 
-Assign Risk
+                        Assign Risk Champion
 
-</button>
+                    </label>
 
-<a
-href="/"
-class="btn btn-secondary">
+                    <select
+                        name="owner_id"
+                        class="form-select"
+                        required>
 
-Cancel
+                        <option value="">
 
-</a>
+                            -- Select Risk Champion --
 
-</div>
+                        </option>
 
-</form>
+                        {% for champion in champions %}
 
-</div>
+                        <option value="{{ champion.user_id }}">
 
-</div>
+                            {{ champion.full_name }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- Buttons -->
+
+                <div class="d-flex gap-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-success">
+
+                        Assign Risk
+
+                    </button>
+
+                    <a
+                        href="/"
+                        class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 
 </div>
 
 {% endblock %}
-
