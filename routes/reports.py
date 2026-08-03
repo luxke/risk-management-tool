@@ -9,8 +9,8 @@ reports_bp = Blueprint("reports", __name__)
 @login_required
 def reports():
 
-    # Only Admin and Risk Managers
-    if session["role"] not in ["Admin", "Risk Manager"]:
+    # Only Risk Managers and Risk Owners
+    if session["role"] not in ["Risk Manager", "Risk Owner"]:
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -62,13 +62,13 @@ def reports():
     conditions = []
     params = []
 
-    # Risk Manager only sees own department
-    if session["role"] == "Risk Manager":
+    # Risk Owner only sees own department
+    if session["role"] == "Risk Owner":
         conditions.append("department_id=%s")
         params.append(session["department_id"])
 
-    # Admin Department Filter
-    if session["role"] == "Admin" and selected_department:
+    # Risk Manager Department Filter
+    if session["role"] == "Risk Manager" and selected_department:
         conditions.append("department_id=%s")
         params.append(selected_department)
 
@@ -215,12 +215,12 @@ def reports():
     department_conditions = []
     department_params = []
 
-    # Risk Manager only sees own department
-    if session["role"] == "Risk Manager":
+    # Risk Owner only sees own department
+    if session["role"] == "Risk Owner":
         department_conditions.append("d.department_id=%s")
         department_params.append(session["department_id"])
 
-    # Admin Department Filter
+    # Risk Manager Department Filter
     elif selected_department:
         department_conditions.append("d.department_id=%s")
         department_params.append(selected_department)
@@ -262,12 +262,12 @@ def reports():
     category_conditions = []
     category_params = []
 
-    # Risk Manager only sees own department
-    if session["role"] == "Risk Manager":
+    # Risk Owner only sees own department
+    if session["role"] == "Risk Owner":
         category_conditions.append("r.department_id=%s")
         category_params.append(session["department_id"])
 
-    # Admin Department Filter
+    # Risk Manager Department Filter
     elif selected_department:
         category_conditions.append("r.department_id=%s")
         category_params.append(selected_department)

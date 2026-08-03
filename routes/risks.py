@@ -221,13 +221,13 @@ def add_risk():
         categories=categories
     )
 
-@risks_bp.route("/assign-risk/[int:risk_id](int:risk_id)", methods=["GET", "POST"])
+@risks_bp.route("/assign-risk/<int:risk_id>", methods=["GET", "POST"])
 @login_required
 def assign_risk(risk_id):
 
 
-    # Only Risk Manager can assign risks
-    if session["role"] != "Risk Manager":
+    # Only Risk Owner can assign risks
+    if session["role"] != "Risk Owner":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -255,7 +255,7 @@ def assign_risk(risk_id):
     # ==========================
     # Security Check
     # ==========================
-    # Risk Manager can only assign
+    # Risk Owner can only assign
     # risks belonging to their department
     if risk["department_id"] != session["department_id"]:
         conn.close()
@@ -386,7 +386,7 @@ def assign_risk(risk_id):
 @login_required
 def edit_risk(risk_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -523,7 +523,7 @@ def edit_risk(risk_id):
 @login_required
 def delete_risk(risk_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -543,14 +543,14 @@ def delete_risk(risk_id):
 @login_required
 def update_risk(risk_id):
 
-    # Only employees can update risks
-    if session["role"] != "Employee":
+    # Only Risk champion can update risks
+    if session["role"] != "Risk Champion":
         return "Access Denied", 403
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Load the employee's assigned risk
+    # Load the Risk Champion's assigned risk
     cursor.execute("""
         SELECT
             r.*,
@@ -659,7 +659,7 @@ def update_risk(risk_id):
             ))
 
     # ======================================
-    # Get Employee details
+    # Get Risk Champion details
     # ======================================
 
     cursor.execute("""
@@ -668,10 +668,10 @@ def update_risk(risk_id):
         WHERE user_id=%s
     """, (session["user_id"],))
 
-    employee = cursor.fetchone()
+    champion = cursor.fetchone()
 
     # ======================================
-    # Notify Department Risk Manager
+    # Notify Department Risk Owner
     # ======================================
 
     cursor.execute("""
@@ -682,14 +682,14 @@ def update_risk(risk_id):
         FROM users
         WHERE
             department_id=%s
-            AND role='Risk Manager'
+            AND role='Risk Owner'
             AND status='Active'
         LIMIT 1
     """, (risk["department_id"],))
 
-    manager = cursor.fetchone()
+    owner = cursor.fetchone()
 
-    if manager:
+    if owner:
 
         # Dashboard Notification
         cursor.execute("""
@@ -702,17 +702,17 @@ def update_risk(risk_id):
             VALUES
             (%s,%s,%s)
         """, (
-            manager["user_id"],
+            owner["user_id"],
             risk_id,
-            f"{employee['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
+            f"{champion['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
         ))
 
         # Email
         html = render_template(
             "emails/risk_updated.html",
-            recipient_name=manager["full_name"],
+            recipient_name=owner["full_name"],
             intro_message="An employee in your department has updated a risk that you oversee. Please review the latest progress and take any necessary action.",
-            updated_by=employee["full_name"],
+            updated_by=champion["full_name"],
             risk_reference=risk["risk_reference"],
             status=new_status,
             notes=progress_notes,
@@ -726,7 +726,7 @@ def update_risk(risk_id):
         )
 
         send_email(
-            recipient=manager["email"],
+            recipient=owner["email"],
             subject="Risk Updated",
             html=page
         )
@@ -742,13 +742,13 @@ def update_risk(risk_id):
             email
         FROM users
         WHERE
-            role='Admin'
+            role='Risk Manager'
             AND status='Active'
     """)
 
-    admins = cursor.fetchall()
+    managers = cursor.fetchall()
 
-    for admin in admins:
+    for manager in managers:
 
         # Dashboard Notification
         cursor.execute("""
@@ -761,17 +761,17 @@ def update_risk(risk_id):
             VALUES
             (%s,%s,%s)
         """, (
-            admin["user_id"],
+            manager["user_id"],
             risk_id,
-            f"{employee['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
+            f"{champion['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
         ))
 
         # Email
         html = render_template(
             "emails/risk_updated.html",
-            recipient_name=admin["full_name"],
-            intro_message="An employee has updated a risk in the system. This update is provided for your oversight and monitoring.",
-            updated_by=employee["full_name"],
+            recipient_name=manager["full_name"],
+            intro_message="A Risk Champion has updated a risk in the system. This update is provided for your oversight and monitoring.",
+            updated_by=champion["full_name"],
             risk_reference=risk["risk_reference"],
             status=new_status,
             notes=progress_notes,
@@ -784,7 +784,7 @@ def update_risk(risk_id):
         )
 
         send_email(
-            recipient=admin["email"],
+            recipient=manager["email"],
             subject="Risk Updated",
             html=page
         )

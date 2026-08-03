@@ -13,11 +13,11 @@ VALUES (%s, %s, %s, %s)
     "System Administrator",
     "admin@gmail.com",
     hashed_password,
-    "Admin"
+    "Risk Manager"
 ))
 
 conn.commit()
 
-print("Admin account created successfully!")
+print("Risk Manager's account created successfully!")
 
 conn.close()

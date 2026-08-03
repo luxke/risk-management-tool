@@ -12,7 +12,7 @@ departments_bp = Blueprint("departments", __name__)
 @login_required
 def departments():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -41,7 +41,7 @@ def departments():
 @login_required
 def add_department():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     if request.method == "POST":
@@ -71,7 +71,7 @@ def add_department():
 @login_required
 def edit_department(department_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -115,7 +115,7 @@ def edit_department(department_id):
 @login_required
 def delete_department(department_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()

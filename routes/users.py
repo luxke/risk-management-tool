@@ -10,7 +10,7 @@ users_bp = Blueprint("users", __name__)
 @login_required
 def users():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -39,7 +39,7 @@ def users():
 @login_required
 def add_user():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -87,7 +87,7 @@ def add_user():
 @login_required
 def edit_user(user_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -143,7 +143,7 @@ def edit_user(user_id):
 @login_required
 def deactivate_user(user_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     if session["user_id"] == user_id:
@@ -168,7 +168,7 @@ def deactivate_user(user_id):
 @login_required
 def activate_user(user_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()

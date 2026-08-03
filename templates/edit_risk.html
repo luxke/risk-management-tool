@@ -53,7 +53,7 @@ required>{{ risk.Description }}</textarea>
 
 <label class="form-label">Department</label>
 
-{% if session["role"] == "Admin" %}
+{% if session["role"] == "Risk Manager" %}
 
 <select
 name="department_id"
@@ -217,7 +217,7 @@ Risk Assessment
     <div class="col-md-6 mb-3">
         <label class="form-label">Risk Owner</label>
 
-        {% if session["role"] == "Admin" %}
+        {% if session["role"] == "Risk Manager" %}
             <input
                 type="text"
                 class="form-control"

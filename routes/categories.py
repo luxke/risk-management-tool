@@ -12,7 +12,7 @@ categories_bp = Blueprint("categories", __name__)
 @login_required
 def categories():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -41,7 +41,7 @@ def categories():
 @login_required
 def add_category():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     if request.method == "POST":
@@ -71,7 +71,7 @@ def add_category():
 @login_required
 def edit_category(category_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -118,7 +118,7 @@ def edit_category(category_id):
 @login_required
 def delete_category(category_id):
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()

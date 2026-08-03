@@ -52,16 +52,16 @@ value="{{ user.email }}">
 
 <select name="role" class="form-control">
 
-<option {% if user.role=="Employee" %}selected{% endif %}>
-Employee
+<option {% if user.role=="Risk Champion" %}selected{% endif %}>
+Risk Champion
+</option>
+
+<option {% if user.role=="Risk Owner" %}selected{% endif %}>
+Risk Owner
 </option>
 
 <option {% if user.role=="Risk Manager" %}selected{% endif %}>
 Risk Manager
-</option>
-
-<option {% if user.role=="Admin" %}selected{% endif %}>
-Admin
 </option>
 
 </select>

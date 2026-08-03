@@ -43,9 +43,9 @@ User Management
                 <select class="form-select">
 
                     <option>All Roles</option>
-                    <option>Admin</option>
                     <option>Risk Manager</option>
-                    <option>Employee</option>
+                    <option>Risk Owner</option>
+                    <option>Risk Champion</option>
 
                 </select>
 
@@ -125,7 +125,7 @@ User Management
 
 <td>
 
-{% if user.role == "Admin" %}
+{% if user.role == "Risk Manager" %}
 
 <span class="badge bg-danger">
 
@@ -133,7 +133,7 @@ User Management
 
 </span>
 
-{% elif user.role == "Risk Manager" %}
+{% elif user.role == "Risk Owner" %}
 
 <span class="badge bg-warning text-dark">
 

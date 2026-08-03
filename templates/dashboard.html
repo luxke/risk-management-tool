@@ -10,10 +10,10 @@ Dashboard
 
 <h2 class="mb-4">
 
-{% if session["role"] == "Admin" %}
-Admin Dashboard
+{% if session["role"] == "Risk Manager" %}
+Risk Manager Dashboard
 
-{% elif session["role"] == "Risk Manager" %}
+{% elif session["role"] == "Risk Owner" %}
 Department Dashboard
 
 {% else %}
@@ -226,19 +226,19 @@ Risk Analytics
 
 <div class="d-flex justify-content-between align-items-center mb-3">
 
-{% if session["role"] == "Admin" %}
+{% if session["role"] == "Risk Manager" %}
 <h4>All Risks</h4>
 
-{% elif session["role"] == "Risk Manager" %}
+{% elif session["role"] == "Risk Owner" %}
 <h4>Department Risks</h4>
 
 {% else %}
 <h4>My Risks</h4>
 
 {% endif %}
-<!--Admin, Risk Manager, and Employee can add new risks -->
+<!--Risk Manager and Risk Champion can add new risks -->
 
-{% if session["role"] in ["Admin","Employee"] %} 
+{% if session["role"] in ["Risk Manager","Risk Champion"] %} 
 <a href="/add-risk" class="btn btn-success">
 + Add New Risk
 </a>
@@ -289,7 +289,7 @@ Risk Analytics
 
 <td>{{ risk.Tittle }}</td>
 
-{% if session["role"] == "Admin" %}
+{% if session["role"] == "Risk Manager" %}
 
 <td>{{ risk.department_name }}</td>
 
@@ -305,7 +305,7 @@ Not Assigned
 
 </td>
 
-{% elif session["role"] == "Risk Manager" %}
+{% elif session["role"] == "Risk Owner" %}
 
 <td>
 
@@ -453,7 +453,7 @@ Closed
 
 <td>
 
-{% if session["role"] == "Admin" %}
+{% if session["role"] == "Risk Manager" %}
 
 <a href="/risk-details/{{ risk.Risk_id }}"
 class="btn btn-primary btn-sm">
@@ -478,7 +478,7 @@ Delete
 
 
 
-{% elif session["role"] == "Risk Manager" %}
+{% elif session["role"] == "Risk Owner" %}
 
 {% if not risk.full_name %}
 
@@ -489,7 +489,7 @@ class="btn btn-primary btn-sm">
 
 <a href="/assign-risk/{{ risk.Risk_id }}"
 class="btn btn-primary btn-sm">
-Assign Employee
+Assign Risk Champion
 </a>
 
 {% else %}

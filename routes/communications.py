@@ -13,8 +13,8 @@ communications_bp = Blueprint("communications", __name__)
 @login_required
 def communications():
 
-    # Only Admin can manage communications
-    if session["role"] != "Admin":
+    # Only Risk Managers can manage communications
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
@@ -47,7 +47,7 @@ def communications():
 @login_required
 def add_communication():
 
-    if session["role"] != "Admin":
+    if session["role"] != "Risk Manager":
         return "Access Denied", 403
 
     conn = get_db_connection()
