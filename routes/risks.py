@@ -543,14 +543,18 @@ def delete_risk(risk_id):
 @login_required
 def update_risk(risk_id):
 
-    # Only Risk champion can update risks
+
+    # Only Risk Champion can update risks
     if session["role"] != "Risk Champion":
         return "Access Denied", 403
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Load the Risk Champion's assigned risk
+    # ======================================
+    # Load Risk Champion's assigned risk
+    # ======================================
+
     cursor.execute("""
         SELECT
             r.*,
@@ -558,12 +562,16 @@ def update_risk(risk_id):
             c.category_name,
             s.status_name
         FROM risks r
+
         LEFT JOIN departments d
             ON r.department_id = d.department_id
+
         LEFT JOIN risk_categories c
             ON r.category_id = c.category_id
+
         LEFT JOIN risk_status s
             ON r.status_id = s.status_id
+
         WHERE
             r.Risk_id=%s
             AND r.Owner_id=%s
@@ -578,59 +586,86 @@ def update_risk(risk_id):
         conn.close()
         return "Risk not found.", 404
 
-    # Load all statuses
+    # ======================================
+    # Load all risk statuses
+    # ======================================
+
     cursor.execute("""
         SELECT *
         FROM risk_status
         ORDER BY status_id
     """)
+
     statuses = cursor.fetchall()
+
+    # ======================================
+    # POST - Update Risk
+    # ======================================
 
     if request.method == "POST":
 
         status_id = int(request.form["status_id"])
         progress_notes = request.form["progress_notes"]
 
-        # ---------------------------------
-        # Get old status name
-        # ---------------------------------
+        # --------------------------------------
+        # Get old status
+        # --------------------------------------
+
         cursor.execute("""
             SELECT status_name
             FROM risk_status
             WHERE status_id=%s
         """, (risk["status_id"],))
 
-        old_status = cursor.fetchone()["status_name"]
+        old_status_result = cursor.fetchone()
 
-        # ---------------------------------
-        # Get new status name
-        # ---------------------------------
+        old_status = (
+            old_status_result["status_name"]
+            if old_status_result
+            else "Unknown"
+        )
+
+        # --------------------------------------
+        # Get new status
+        # --------------------------------------
+
         cursor.execute("""
             SELECT status_name
             FROM risk_status
             WHERE status_id=%s
         """, (status_id,))
 
-        new_status = cursor.fetchone()["status_name"]
+        new_status_result = cursor.fetchone()
 
-        # ---------------------------------
-        # Update Risk
-        # ---------------------------------
+        if not new_status_result:
+            conn.close()
+            return "Invalid status.", 400
+
+        new_status = new_status_result["status_name"]
+
+        # --------------------------------------
+        # Update risk
+        # --------------------------------------
+
         cursor.execute("""
             UPDATE risks
             SET
                 status_id=%s,
                 progress_notes=%s
-            WHERE Risk_id=%s
+            WHERE
+                Risk_id=%s
+                AND Owner_id=%s
         """, (
             status_id,
             progress_notes,
-            risk_id
+            risk_id,
+            session["user_id"]
         ))
 
-        # ---------------------------------
-        # Build audit message
-        # ---------------------------------
+        # --------------------------------------
+        # Create audit message
+        # --------------------------------------
+
         actions = []
 
         if old_status != new_status:
@@ -639,9 +674,10 @@ def update_risk(risk_id):
             )
 
         if progress_notes.strip():
-            actions.append("Updated progress notes.")
+            actions.append(
+                "Updated progress notes."
+            )
 
-        # Save audit only if something changed
         if actions:
 
             cursor.execute("""
@@ -651,148 +687,167 @@ def update_risk(risk_id):
                     action_taken,
                     changed_by
                 )
-                VALUES (%s,%s,%s)
+                VALUES
+                (%s,%s,%s)
             """, (
                 risk_id,
                 " ".join(actions),
                 session["user_id"]
             ))
 
-    # ======================================
-    # Get Risk Champion details
-    # ======================================
+        # ======================================
+        # Get Risk Champion details
+        # ======================================
 
-    cursor.execute("""
-        SELECT full_name
-        FROM users
-        WHERE user_id=%s
-    """, (session["user_id"],))
-
-    champion = cursor.fetchone()
-
-    # ======================================
-    # Notify Department Risk Owner
-    # ======================================
-
-    cursor.execute("""
-        SELECT
-            user_id,
-            full_name,
-            email
-        FROM users
-        WHERE
-            department_id=%s
-            AND role='Risk Owner'
-            AND status='Active'
-        LIMIT 1
-    """, (risk["department_id"],))
-
-    owner = cursor.fetchone()
-
-    if owner:
-
-        # Dashboard Notification
         cursor.execute("""
-            INSERT INTO notifications
-            (
-                user_id,
-                risk_id,
-                message
-            )
-            VALUES
-            (%s,%s,%s)
-        """, (
-            owner["user_id"],
-            risk_id,
-            f"{champion['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
-        ))
+            SELECT
+                full_name
+            FROM users
+            WHERE user_id=%s
+        """, (session["user_id"],))
 
-        # Email
-        html = render_template(
-            "emails/risk_updated.html",
-            recipient_name=owner["full_name"],
-            intro_message="An employee in your department has updated a risk that you oversee. Please review the latest progress and take any necessary action.",
-            updated_by=champion["full_name"],
-            risk_reference=risk["risk_reference"],
-            status=new_status,
-            notes=progress_notes,
-            url="http://127.0.0.1:5000"
+        champion = cursor.fetchone()
+
+        # ======================================
+        # Notify Risk Owner
+        # ======================================
+
+        cursor.execute("""
+            SELECT
+                user_id,
+                full_name,
+                email
+            FROM users
+            WHERE
+                department_id=%s
+                AND role='Risk Owner'
+                AND status='Active'
+            LIMIT 1
+        """, (risk["department_id"],))
+
+        owner = cursor.fetchone()
+
+        if owner:
+
+            # System notification
+            cursor.execute("""
+                INSERT INTO notifications
+                (
+                    user_id,
+                    risk_id,
+                    message
                 )
-        
-
-        page = render_template(
-            "emails/base_email.html",
-            body=html
-        )
-
-        send_email(
-            recipient=owner["email"],
-            subject="Risk Updated",
-            html=page
-        )
-
-    # ======================================
-    # Notify ALL Admins
-    # ======================================
-
-    cursor.execute("""
-        SELECT
-            user_id,
-            full_name,
-            email
-        FROM users
-        WHERE
-            role='Risk Manager'
-            AND status='Active'
-    """)
-
-    managers = cursor.fetchall()
-
-    for manager in managers:
-
-        # Dashboard Notification
-        cursor.execute("""
-            INSERT INTO notifications
-            (
-                user_id,
+                VALUES
+                (%s,%s,%s)
+            """, (
+                owner["user_id"],
                 risk_id,
-                message
+                f"{champion['full_name']} updated Risk "
+                f"{risk['risk_reference']} to '{new_status}'."
+            ))
+
+            # Email
+            html = render_template(
+                "emails/risk_updated.html",
+                recipient_name=owner["full_name"],
+                intro_message=(
+                    "A Risk Champion in your department has "
+                    "updated a risk. Please review the latest "
+                    "progress."
+                ),
+                updated_by=champion["full_name"],
+                risk_reference=risk["risk_reference"],
+                status=new_status,
+                notes=progress_notes,
+                url="http://127.0.0.1:5000"
             )
-            VALUES
-            (%s,%s,%s)
-        """, (
-            manager["user_id"],
-            risk_id,
-            f"{champion['full_name']} updated Risk {risk['risk_reference']} to '{new_status}'."
-        ))
 
-        # Email
-        html = render_template(
-            "emails/risk_updated.html",
-            recipient_name=manager["full_name"],
-            intro_message="A Risk Champion has updated a risk in the system. This update is provided for your oversight and monitoring.",
-            updated_by=champion["full_name"],
-            risk_reference=risk["risk_reference"],
-            status=new_status,
-            notes=progress_notes,
-            url="http://127.0.0.1:5000"
-        )
+            page = render_template(
+                "emails/base_email.html",
+                body=html
+            )
 
-        page = render_template(
-            "emails/base_email.html",
-            body=html
-        )
+            send_email(
+                recipient=owner["email"],
+                subject="Risk Updated by Risk Champion",
+                html=page
+            )
 
-        send_email(
-            recipient=manager["email"],
-            subject="Risk Updated",
-            html=page
-        )
+        # ======================================
+        # Notify ALL Risk Managers
+        # ======================================
+
+        cursor.execute("""
+            SELECT
+                user_id,
+                full_name,
+                email
+            FROM users
+            WHERE
+                role='Risk Manager'
+                AND status='Active'
+        """)
+
+        managers = cursor.fetchall()
+
+        for manager in managers:
+
+            # System notification
+            cursor.execute("""
+                INSERT INTO notifications
+                (
+                    user_id,
+                    risk_id,
+                    message
+                )
+                VALUES
+                (%s,%s,%s)
+            """, (
+                manager["user_id"],
+                risk_id,
+                f"{champion['full_name']} updated Risk "
+                f"{risk['risk_reference']} to '{new_status}'."
+            ))
+
+            # Email
+            html = render_template(
+                "emails/risk_updated.html",
+                recipient_name=manager["full_name"],
+                intro_message=(
+                    "A Risk Champion has updated a risk "
+                    "in the system. This update is provided "
+                    "for your oversight and monitoring."
+                ),
+                updated_by=champion["full_name"],
+                risk_reference=risk["risk_reference"],
+                status=new_status,
+                notes=progress_notes,
+                url="http://127.0.0.1:5000"
+            )
+
+            page = render_template(
+                "emails/base_email.html",
+                body=html
+            )
+
+            send_email(
+                recipient=manager["email"],
+                subject="Risk Updated by Risk Champion",
+                html=page
+            )
+
+        # ======================================
+        # Commit everything
+        # ======================================
 
         conn.commit()
         conn.close()
 
         return redirect("/")
+
+    # ======================================
+    # GET - Display update form
+    # ======================================
 
     conn.close()
 
@@ -801,6 +856,7 @@ def update_risk(risk_id):
         risk=risk,
         statuses=statuses
     )
+
 
 @risks_bp.route("/risk-details/<int:risk_id>")
 @login_required
