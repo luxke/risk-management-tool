@@ -9,7 +9,7 @@ Update Risk
 
 <div class="row justify-content-center">
 
-<div class="col-lg-10">
+<div class="col-lg-11">
 
 <div class="card shadow">
 
@@ -24,6 +24,10 @@ Risk Champion Risk Workspace
 <div class="card-body">
 
 <form method="POST">
+
+<!-- ========================= -->
+<!-- BASIC DETAILS -->
+<!-- ========================= -->
 
 <div class="row">
 
@@ -70,118 +74,83 @@ readonly>{{ risk.Description }}</textarea>
 
 </div>
 
-<div class="row">
+<!-- ========================= -->
+<!-- INHERENT RISK -->
+<!-- ========================= -->
 
-<div class="col-md-3 mb-3">
+<h5 class="mb-3">
+Inherent Risk Assessment
+</h5>
 
-<label class="form-label fw-bold">
-Category
-</label>
+<div class="table-responsive">
 
-<input
-type="text"
-class="form-control"
-value="{{ risk.category_name }}"
-readonly>
+<table class="table table-bordered text-center align-middle">
 
-</div>
+<thead class="table-light">
 
-<div class="col-md-2 mb-3">
+<tr>
 
-<label class="form-label fw-bold">
-Probability
-</label>
+<th>Likelihood Score</th>
 
-<input
-type="text"
-class="form-control"
-value="{{ risk.Probability }}"
-readonly>
+<th>Impact Score</th>
 
-</div>
+<th>Overall Score</th>
 
-<div class="col-md-2 mb-3">
+<th>Inherent Risk Level</th>
 
-<label class="form-label fw-bold">
-Impact
-</label>
+</tr>
 
-<input
-type="text"
-class="form-control"
-value="{{ risk.Impact }}"
-readonly>
+</thead>
 
-</div>
+<tbody>
 
-<div class="col-md-2 mb-3">
+<tr>
 
-<label class="form-label fw-bold">
-Risk Score
-</label>
+<td>{{ risk.Probability }}</td>
 
-{% if risk.Score >= 15 %}
+<td>{{ risk.Impact }}</td>
 
-<div class="alert alert-danger text-center py-2 mb-0">
-<strong>{{ risk.Score }}</strong><br>
-High
-</div>
+<td>{{ risk.Score }}</td>
 
-{% elif risk.Score >= 8 %}
+<td>
 
-<div class="alert alert-warning text-center py-2 mb-0">
-<strong>{{ risk.Score }}</strong><br>
-Medium
-</div>
+{% if risk.Score <=3 %}
+
+<span class="badge risk-low">Low</span>
+
+{% elif risk.Score <=7 %}
+
+<span class="badge risk-minor">Minor</span>
+
+{% elif risk.Score <=14 %}
+
+<span class="badge risk-medium">Medium</span>
+
+{% elif risk.Score <=19 %}
+
+<span class="badge risk-high">High</span>
 
 {% else %}
 
-<div class="alert alert-success text-center py-2 mb-0">
-<strong>{{ risk.Score }}</strong><br>
-Low
-</div>
+<span class="badge risk-extreme">Extreme</span>
 
 {% endif %}
 
-</div>
+</td>
 
-<div class="col-md-3 mb-3">
+</tr>
 
-<label class="form-label fw-bold">
-Current Status
-</label>
+</tbody>
 
-<p>
-
-{% if risk.status_name == "Open" %}
-<span class="badge bg-primary">{{ risk.status_name }}</span>
-
-{% elif risk.status_name == "Assigned" %}
-<span class="badge bg-secondary">{{ risk.status_name }}</span>
-
-{% elif risk.status_name == "Under Review" %}
-<span class="badge bg-warning text-dark">{{ risk.status_name }}</span>
-
-{% elif risk.status_name == "Mitigation" %}
-<span class="badge bg-danger">{{ risk.status_name }}</span>
-
-{% elif risk.status_name == "Monitoring" %}
-<span class="badge bg-info">{{ risk.status_name }}</span>
-
-{% elif risk.status_name == "Closed" %}
-<span class="badge bg-success">{{ risk.status_name }}</span>
-
-{% else %}
-<span class="badge bg-dark">{{ risk.status_name }}</span>
-{% endif %}
-
-</p>
-
-</div>
+</table>
 
 </div>
 
 <hr>
+
+<!-- ========================= -->
+<!-- PROGRESS -->
+<!-- ========================= -->
 
 <h5>
 Progress Update
@@ -195,9 +164,8 @@ Progress Notes
 
 <textarea
 name="progress_notes"
-rows="7"
-class="form-control"
-placeholder="Describe the work completed...">{{ risk.progress_notes }}</textarea>
+rows="6"
+class="form-control">{{ risk.progress_notes }}</textarea>
 
 </div>
 
@@ -216,9 +184,7 @@ required>
 
 <option
 value="{{ status.status_id }}"
-{% if status.status_id == risk.status_id %}
-selected
-{% endif %}>
+{% if status.status_id==risk.status_id %}selected{% endif %}>
 
 {{ status.status_name }}
 
@@ -230,22 +196,120 @@ selected
 
 </div>
 
-<div class="text-end">
+<hr>
+
+<!-- ========================= -->
+<!-- RESIDUAL RISK -->
+<!-- ========================= -->
+
+<h5 class="mb-3">
+Residual Risk Assessment
+</h5>
+
+<div class="table-responsive">
+
+<table class="table table-bordered text-center align-middle">
+
+<thead class="table-light">
+
+<tr>
+
+<th>Residual Likelihood Score</th>
+
+<th>Residual Impact Score</th>
+
+<th>Residual Overall Score</th>
+
+<th>Residual Risk Level</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>
+
+<input
+type="number"
+min="1"
+max="5"
+name="residual_probability"
+id="residual_probability"
+class="form-control text-center"
+value="{{ risk.residual_probability or '' }}">
+
+</td>
+
+<td>
+
+<input
+type="number"
+min="1"
+max="5"
+name="residual_impact"
+id="residual_impact"
+class="form-control text-center"
+value="{{ risk.residual_impact or '' }}">
+
+</td>
+
+<td>
+
+<input
+type="text"
+name="residual_score"
+id="residual_score"
+class="form-control text-center fw-bold"
+readonly
+value="{{ risk.residual_score or '' }}">
+
+</td>
+
+<td>
+
+<span
+id="riskLevelBadge"
+class="badge fs-6 px-3 py-2">
+
+-
+
+</span>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<div class="text-end mt-4">
 
 <a href="/" class="btn btn-secondary">
+
 Back
+
 </a>
 
 <button
 type="reset"
 class="btn btn-warning">
+
 Reset
+
 </button>
 
 <button
 type="submit"
 class="btn btn-success px-4">
+
 Save Changes
+
 </button>
 
 </div>
@@ -260,5 +324,93 @@ Save Changes
 
 </div>
 
-{% endblock %}
+<style>
 
+.risk-low{
+background:#92D050;
+color:#000;
+}
+
+.risk-minor{
+background:#C4D600;
+color:#000;
+}
+
+.risk-medium{
+background:#FFFF00;
+color:#000;
+}
+
+.risk-high{
+background:#FFC000;
+color:#000;
+}
+
+.risk-extreme{
+background:#FF0000;
+color:#fff;
+}
+
+</style>
+
+<script>
+
+function calculateResidualRisk(){
+
+let likelihood=parseInt(document.getElementById("residual_probability").value)||0;
+let impact=parseInt(document.getElementById("residual_impact").value)||0;
+
+let score=likelihood*impact;
+
+document.getElementById("residual_score").value=score;
+
+let badge=document.getElementById("riskLevelBadge");
+
+if(score<=3 && score>0){
+
+badge.className="badge risk-low";
+badge.innerHTML="Low";
+
+}
+else if(score<=7){
+
+badge.className="badge risk-minor";
+badge.innerHTML="Minor";
+
+}
+else if(score<=14){
+
+badge.className="badge risk-medium";
+badge.innerHTML="Medium";
+
+}
+else if(score<=19){
+
+badge.className="badge risk-high";
+badge.innerHTML="High";
+
+}
+else if(score<=25){
+
+badge.className="badge risk-extreme";
+badge.innerHTML="Extreme";
+
+}
+else{
+
+badge.className="badge bg-secondary";
+badge.innerHTML="-";
+
+}
+
+}
+
+document.getElementById("residual_probability").addEventListener("input",calculateResidualRisk);
+
+document.getElementById("residual_impact").addEventListener("input",calculateResidualRisk);
+
+window.onload=calculateResidualRisk;
+
+</script>
+
+{% endblock %}
